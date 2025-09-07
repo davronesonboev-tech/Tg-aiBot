@@ -114,14 +114,17 @@ class AIBot:
         log_info("Получена команда /start", user_id)
 
         # Сохраняем/обновляем пользователя в БД
-        user_data = {
-            'username': message.from_user.username,
-            'first_name': message.from_user.first_name,
-            'last_name': message.from_user.last_name,
-            'language_code': message.from_user.language_code,
-            'is_premium': message.from_user.is_premium or False
-        }
-        self.db.get_or_create_user(user_id, **user_data)
+        try:
+            user_data = {
+                'username': message.from_user.username,
+                'first_name': message.from_user.first_name,
+                'last_name': message.from_user.last_name,
+                'language_code': message.from_user.language_code,
+                'is_premium': message.from_user.is_premium or False
+            }
+            self.db.get_or_create_user(user_id, **user_data)
+        except Exception as e:
+            log_error(f"Ошибка сохранения пользователя {user_id}: {str(e)}")
 
         current_persona = persona_manager.get_current_persona()
         is_admin = user_id == config.ADMIN_USER_ID
@@ -815,44 +818,55 @@ class AIBot:
         """Обработка админских callback'ов."""
         user_id = callback.from_user.id
 
-        if callback_data == "admin_users":
-            users_text = "👥 <b>Управление пользователями</b>\n\nВыберите действие:"
-            await self._safe_edit_message(callback, users_text, keyboard_manager.get_admin_users_menu())
+        try:
+            if callback_data == "admin_users":
+                users_text = "👥 <b>Управление пользователями</b>\n\nВыберите действие:"
+                await self._safe_edit_message(callback, users_text, keyboard_manager.get_admin_users_menu())
 
-        elif callback_data == "admin_stats":
-            stats_text = "📊 <b>Просмотр статистики</b>\n\nВыберите тип статистики:"
-            await self._safe_edit_message(callback, stats_text, keyboard_manager.get_admin_stats_menu())
+            elif callback_data == "admin_stats":
+                stats_text = "📊 <b>Просмотр статистики</b>\n\nВыберите тип статистики:"
+                await self._safe_edit_message(callback, stats_text, keyboard_manager.get_admin_stats_menu())
 
-        elif callback_data == "admin_search":
-            search_text = "🔍 <b>Поиск пользователей</b>\n\nВыберите способ поиска:"
-            await self._safe_edit_message(callback, search_text, keyboard_manager.get_admin_search_menu())
+            elif callback_data == "admin_search":
+                search_text = "🔍 <b>Поиск пользователей</b>\n\nВыберите способ поиска:"
+                await self._safe_edit_message(callback, search_text, keyboard_manager.get_admin_search_menu())
 
-        elif callback_data == "admin_users_list":
-            await self._show_users_list(callback)
+            elif callback_data == "admin_users_list":
+                await self._show_users_list(callback)
 
-        elif callback_data == "admin_stats_general":
-            await self._show_general_stats(callback)
+            elif callback_data == "admin_top_users":
+                await self._show_top_users(callback)
 
-        elif callback_data == "admin_stats_games":
-            await self._show_games_stats(callback)
+            elif callback_data == "admin_stats_general":
+                await self._show_general_stats(callback)
 
-        elif callback_data == "admin_stats_messages":
-            await self._show_messages_stats(callback)
+            elif callback_data == "admin_stats_games":
+                await self._show_games_stats(callback)
 
-        elif callback_data.startswith("admin_clear_user"):
-            await self._handle_clear_user(callback)
+            elif callback_data == "admin_stats_messages":
+                await self._show_messages_stats(callback)
 
-        elif callback_data == "admin_clear_all":
-            await self._handle_clear_all_users(callback)
+            elif callback_data.startswith("admin_clear_user"):
+                await self._handle_clear_user(callback)
 
-        elif callback_data.startswith("admin_ban_user"):
-            await self._handle_ban_user(callback)
+            elif callback_data == "admin_clear_all":
+                await self._handle_clear_all_users(callback)
 
-        elif callback_data.startswith("admin_unban_user"):
-            await self._handle_unban_user(callback)
+            elif callback_data == "confirm_clear_all":
+                await self._confirm_clear_all_users(callback)
 
-        else:
-            await callback.answer("❓ Неизвестная админская команда")
+            elif callback_data.startswith("admin_ban_user"):
+                await self._handle_ban_user(callback)
+
+            elif callback_data.startswith("admin_unban_user"):
+                await self._handle_unban_user(callback)
+
+            else:
+                await callback.answer("❓ Неизвестная админская команда")
+
+        except Exception as e:
+            log_error(f"Ошибка при обработке админской команды {callback_data}: {str(e)}")
+            await callback.answer("❌ Произошла ошибка при обработке команды")
 
     async def _show_users_list(self, callback: types.CallbackQuery):
         """Показать список пользователей."""
@@ -876,6 +890,31 @@ class AIBot:
         except Exception as e:
             log_error(f"Ошибка получения списка пользователей: {str(e)}")
             await callback.answer("❌ Ошибка загрузки списка пользователей")
+
+    async def _show_top_users(self, callback: types.CallbackQuery):
+        """Показать топ пользователей по различным метрикам."""
+        try:
+            # Получить топ пользователей по сообщениям
+            users = self.db.get_all_users(limit=10)
+
+            if not users:
+                text = "👑 <b>Топ пользователей</b>\n\nПользователи не найдены."
+            else:
+                text = "👑 <b>Топ 10 активных пользователей</b>\n\n"
+
+                for i, user in enumerate(users[:10], 1):
+                    medal = "🥇" if i == 1 else "🥈" if i == 2 else "🥉" if i == 3 else "⭐"
+                    username = f"@{user['username']}" if user['username'] else "без username"
+                    text += f"{medal} <b>{i}.</b> <code>{user['id']}</code>\n"
+                    text += f"   👤 {user['first_name']} ({username})\n"
+                    text += f"   📊 Сообщений: {user['total_messages']}\n"
+                    text += f"   🎮 Игр: {user['total_games']} | 🌐 Переводов: {user['total_translations']}\n\n"
+
+            await self._safe_edit_message(callback, text, keyboard_manager.get_admin_search_menu())
+
+        except Exception as e:
+            log_error(f"Ошибка получения топ пользователей: {str(e)}")
+            await callback.answer("❌ Ошибка загрузки топ пользователей")
 
     async def _show_general_stats(self, callback: types.CallbackQuery):
         """Показать общую статистику."""
@@ -962,6 +1001,31 @@ class AIBot:
         text += "<i>Пример: 123456789</i>"
 
         await self._safe_edit_message(callback, text, keyboard_manager.get_admin_users_menu())
+
+    async def _confirm_clear_all_users(self, callback: types.CallbackQuery):
+        """Подтверждение очистки всех данных пользователей."""
+        try:
+            # Выполняем очистку
+            self.db.clear_all_users_stats()
+
+            text = "✅ <b>Очистка завершена!</b>\n\n"
+            text += "🗑️ Статистика всех пользователей была успешно очищена:\n"
+            text += "• Сообщения\n"
+            text += "• Игровые сессии\n"
+            text += "• История переводов\n"
+            text += "• Данные калькулятора\n"
+            text += "• Факты и шутки\n\n"
+            text += "📊 <b>Примечание:</b> Пользователи остаются в системе"
+
+            await self._safe_edit_message(callback, text, keyboard_manager.get_admin_users_menu())
+
+        except Exception as e:
+            log_error(f"Ошибка при очистке всех данных: {str(e)}")
+            error_text = "❌ <b>Ошибка при очистке данных</b>\n\n"
+            error_text += f"Произошла ошибка: {str(e)}\n\n"
+            error_text += "Попробуйте еще раз или обратитесь к разработчику"
+
+            await self._safe_edit_message(callback, error_text, keyboard_manager.get_admin_users_menu())
 
     def _is_same_markup(self, markup1, markup2) -> bool:
         """Проверяет, одинаковые ли клавиатуры."""
@@ -1050,8 +1114,11 @@ class AIBot:
                 log_info("Отправлен ответ на текстовое сообщение", user_id)
 
                 # Логируем статистику в БД
-                self.db.log_message(user_id, "text", content=text, response=response)
-                self.db.update_user_stats(user_id, "total_messages")
+                try:
+                    self.db.log_message(user_id, "text", content=text, response=response)
+                    self.db.update_user_stats(user_id, "total_messages")
+                except Exception as e:
+                    log_error(f"Ошибка логирования сообщения пользователя {user_id}: {str(e)}")
 
                 # Сохраняем ответ ассистента в память
                 memory_manager.add_assistant_message(user_id, response, 'text')
@@ -1226,8 +1293,11 @@ class AIBot:
             log_info(f"Отправлена погода для города: {city}", user_id)
 
             # Логируем статистику в БД
-            self.db.log_message(user_id, "weather", content=city, response=weather_info)
-            self.db.update_user_stats(user_id, "total_weather_requests")
+            try:
+                self.db.log_message(user_id, "weather", content=city, response=weather_info)
+                self.db.update_user_stats(user_id, "total_weather_requests")
+            except Exception as e:
+                log_error(f"Ошибка логирования погоды пользователя {user_id}: {str(e)}")
         else:
             await message.reply(f"❌ Не удалось получить погоду для города '{city}'. Попробуйте другой город.")
             log_error(f"Не удалось получить погоду для города: {city}", user_id)
@@ -1271,8 +1341,11 @@ class AIBot:
             log_info(f"Переведен текст на {lang}: {text_to_translate[:50]}...", user_id)
 
             # Логируем статистику в БД
-            self.db.log_message(user_id, "translation", content=text_to_translate, response=translation)
-            self.db.update_user_stats(user_id, "total_translations")
+            try:
+                self.db.log_message(user_id, "translation", content=text_to_translate, response=translation)
+                self.db.update_user_stats(user_id, "total_translations")
+            except Exception as e:
+                log_error(f"Ошибка логирования перевода пользователя {user_id}: {str(e)}")
         else:
             await message.reply("❌ Не удалось выполнить перевод.")
             log_error(f"Ошибка перевода текста: {text_to_translate}", user_id)
@@ -1299,8 +1372,11 @@ class AIBot:
             log_info(f"Выполнен расчет: {expression} = {result}", user_id)
 
             # Логируем статистику в БД
-            self.db.log_message(user_id, "calculator", content=expression, response=str(result))
-            self.db.update_user_stats(user_id, "total_calculations")
+            try:
+                self.db.log_message(user_id, "calculator", content=expression, response=str(result))
+                self.db.update_user_stats(user_id, "total_calculations")
+            except Exception as e:
+                log_error(f"Ошибка логирования калькулятора пользователя {user_id}: {str(e)}")
         else:
             await message.reply("❌ Не удалось вычислить выражение. Попробуйте другое.", reply_markup=keyboard_manager.get_menu_button())
             log_error(f"Ошибка вычисления: {expression}", user_id)
@@ -1317,8 +1393,11 @@ class AIBot:
             log_info("Отправлена шутка", user_id)
 
             # Логируем статистику в БД
-            self.db.log_message(user_id, "joke", response=joke)
-            self.db.update_user_stats(user_id, "total_jokes")
+            try:
+                self.db.log_message(user_id, "joke", response=joke)
+                self.db.update_user_stats(user_id, "total_jokes")
+            except Exception as e:
+                log_error(f"Ошибка логирования шутки пользователя {user_id}: {str(e)}")
 
         elif 'факт' in text_lower or 'fact' in text_lower:
             fact = fun_service.get_random_fact()
@@ -1326,8 +1405,11 @@ class AIBot:
             log_info("Отправлен факт", user_id)
 
             # Логируем статистику в БД
-            self.db.log_message(user_id, "fact", response=fact)
-            self.db.update_user_stats(user_id, "total_facts")
+            try:
+                self.db.log_message(user_id, "fact", response=fact)
+                self.db.update_user_stats(user_id, "total_facts")
+            except Exception as e:
+                log_error(f"Ошибка логирования факта пользователя {user_id}: {str(e)}")
 
         elif 'цитата' in text_lower or 'quote' in text_lower:
             quote = fun_service.get_random_quote()
@@ -1335,8 +1417,11 @@ class AIBot:
             log_info("Отправлена цитата", user_id)
 
             # Логируем статистику в БД
-            self.db.log_message(user_id, "quote", response=quote)
-            self.db.update_user_stats(user_id, "total_quotes")
+            try:
+                self.db.log_message(user_id, "quote", response=quote)
+                self.db.update_user_stats(user_id, "total_quotes")
+            except Exception as e:
+                log_error(f"Ошибка логирования цитаты пользователя {user_id}: {str(e)}")
 
         else:
             # По умолчанию отправляем факт
