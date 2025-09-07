@@ -291,17 +291,17 @@ class KeyboardManager:
     @staticmethod
     def get_admin_stats_menu() -> InlineKeyboardMarkup:
         """Меню просмотра статистики."""
-        builder = InlineKeyboardMarkup()
+        builder = InlineKeyboardBuilder()
 
-        buttons = [
-            [InlineKeyboardButton(text="📊 Общая статистика", callback_data="admin_stats_general")],
-            [InlineKeyboardButton(text="🎮 Статистика игр", callback_data="admin_stats_games")],
-            [InlineKeyboardButton(text="💬 Статистика сообщений", callback_data="admin_stats_messages")],
-            [InlineKeyboardButton(text="📈 Графики и тренды", callback_data="admin_stats_charts")],
-            [InlineKeyboardButton(text="⬅️ Назад в админку", callback_data="admin_main")]
-        ]
+        builder.button(text="📊 Общая статистика", callback_data="admin_stats_general")
+        builder.button(text="🎮 Статистика игр", callback_data="admin_stats_games")
+        builder.button(text="💬 Статистика сообщений", callback_data="admin_stats_messages")
+        builder.button(text="📈 Графики и тренды", callback_data="admin_stats_charts")
 
-        return InlineKeyboardMarkup(inline_keyboard=buttons)
+        builder.button(text="⬅️ Назад в админку", callback_data="admin_main")
+
+        builder.adjust(1, 1, 1, 1, 1)
+        return builder.as_markup()
 
     @staticmethod
     def get_admin_search_menu() -> InlineKeyboardMarkup:
