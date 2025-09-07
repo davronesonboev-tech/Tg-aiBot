@@ -1,5 +1,6 @@
 -- SQL скрипт для создания таблиц в PostgreSQL
--- Выполните этот скрипт в Railway Database
+-- Выполните этот скрипт в Railway Database -> Query
+-- Версия: 1.0 | Дата: 2025-09-08
 
 -- Создание таблицы пользователей
 CREATE TABLE IF NOT EXISTS users (
