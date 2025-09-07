@@ -23,8 +23,11 @@ class Config:
     # Модель Gemini для использования
     GEMINI_MODEL: str = os.getenv("GEMINI_MODEL", "models/gemini-1.5-pro-002")
 
-    # Модель Whisper для распознавания речи
-    WHISPER_MODEL: str = os.getenv("WHISPER_MODEL", "small")
+    # PostgreSQL Database URL
+    DATABASE_URL: Optional[str] = os.getenv("DATABASE_URL")
+
+    # Админ ID
+    ADMIN_USER_ID: int = int(os.getenv("ADMIN_USER_ID", "1395804259"))
 
     # URL для Gemini API
     GEMINI_BASE_URL: str = "https://generativelanguage.googleapis.com/v1"
@@ -44,7 +47,7 @@ class Config:
         Returns:
             bool: True если все переменные установлены, иначе False
         """
-        required_vars = ["TELEGRAM_BOT_TOKEN", "GOOGLE_API_KEY"]
+        required_vars = ["TELEGRAM_BOT_TOKEN", "GOOGLE_API_KEY", "DATABASE_URL"]
         missing_vars = []
 
         for var in required_vars:
