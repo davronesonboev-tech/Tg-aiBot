@@ -11,7 +11,7 @@ class KeyboardManager:
     """Менеджер клавиатур для бота."""
 
     @staticmethod
-    def get_main_menu() -> InlineKeyboardMarkup:
+    def get_main_menu(is_admin: bool = False) -> InlineKeyboardMarkup:
         """Главная клавиатура с основными функциями."""
         builder = InlineKeyboardBuilder()
 
@@ -35,8 +35,15 @@ class KeyboardManager:
         builder.button(text="🧠 Очистить память", callback_data="clear_memory")
         builder.button(text="❓ Помощь", callback_data="help")
 
+        # Админ-панель (только для админа)
+        if is_admin:
+            builder.button(text="👑 Админ", callback_data="admin_panel")
+
         # Устанавливаем сетку 2x2 для основных кнопок, затем 3x3 для остальных
-        builder.adjust(2, 3, 3, 2)
+        if is_admin:
+            builder.adjust(2, 3, 3, 1)
+        else:
+            builder.adjust(2, 3, 3, 1)
 
         return builder.as_markup()
 
@@ -248,6 +255,67 @@ class KeyboardManager:
 
         builder.button(text="🏠 Меню", callback_data="show_main_menu")
 
+        return builder.as_markup()
+
+    @staticmethod
+    def get_admin_menu() -> InlineKeyboardMarkup:
+        """Админ-панель для управления ботом."""
+        builder = InlineKeyboardBuilder()
+
+        builder.button(text="👥 Пользователи", callback_data="admin_users")
+        builder.button(text="📊 Статистика", callback_data="admin_stats")
+        builder.button(text="🔍 Поиск", callback_data="admin_search")
+        builder.button(text="🚫 Баны", callback_data="admin_bans")
+
+        builder.button(text="⬅️ Назад", callback_data="back_to_main")
+
+        builder.adjust(2, 2, 1)
+        return builder.as_markup()
+
+    @staticmethod
+    def get_admin_users_menu() -> InlineKeyboardMarkup:
+        """Меню управления пользователями."""
+        builder = InlineKeyboardBuilder()
+
+        builder.button(text="📋 Список пользователей", callback_data="admin_users_list")
+        builder.button(text="🧹 Очистить одного", callback_data="admin_clear_user")
+        builder.button(text="🗑️ Очистить всех", callback_data="admin_clear_all")
+        builder.button(text="🚫 Забанить", callback_data="admin_ban_user")
+        builder.button(text="✅ Разбанить", callback_data="admin_unban_user")
+
+        builder.button(text="⬅️ Назад в админку", callback_data="admin_main")
+
+        builder.adjust(2, 2, 1)
+        return builder.as_markup()
+
+    @staticmethod
+    def get_admin_stats_menu() -> InlineKeyboardMarkup:
+        """Меню просмотра статистики."""
+        builder = InlineKeyboardMarkup()
+
+        buttons = [
+            [InlineKeyboardButton(text="📊 Общая статистика", callback_data="admin_stats_general")],
+            [InlineKeyboardButton(text="🎮 Статистика игр", callback_data="admin_stats_games")],
+            [InlineKeyboardButton(text="💬 Статистика сообщений", callback_data="admin_stats_messages")],
+            [InlineKeyboardButton(text="📈 Графики и тренды", callback_data="admin_stats_charts")],
+            [InlineKeyboardButton(text="⬅️ Назад в админку", callback_data="admin_main")]
+        ]
+
+        return InlineKeyboardMarkup(inline_keyboard=buttons)
+
+    @staticmethod
+    def get_admin_search_menu() -> InlineKeyboardMarkup:
+        """Меню поиска пользователей."""
+        builder = InlineKeyboardBuilder()
+
+        builder.button(text="🔍 Поиск по ID", callback_data="admin_search_id")
+        builder.button(text="👤 Поиск по username", callback_data="admin_search_username")
+        builder.button(text="📝 Поиск по имени", callback_data="admin_search_name")
+        builder.button(text="📊 Топ активных", callback_data="admin_top_users")
+
+        builder.button(text="⬅️ Назад в админку", callback_data="admin_main")
+
+        builder.adjust(2, 2, 1)
         return builder.as_markup()
 
     @staticmethod
