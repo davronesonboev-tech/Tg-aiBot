@@ -11,9 +11,11 @@ from typing import Optional
 
 from config import config
 from logger import logger, log_info, log_error
-from bot import ai_bot
-from database import init_database
+from database import init_database, get_db_manager
 # Whisper больше не используется - все через Gemini API
+
+# Импорт бота будет после инициализации БД
+ai_bot = None
 
 
 class BotRunner:
@@ -26,8 +28,17 @@ class BotRunner:
 
     async def start_bot(self):
         """Запускает бота."""
+        global ai_bot
+
         try:
             log_info("Запуск Telegram AI бота...")
+
+            # Импортируем и создаем бота после инициализации БД
+            from bot import AIBot
+            if ai_bot is None:
+                ai_bot = AIBot()
+                log_info("Бот успешно создан")
+
             self.running = True
             await ai_bot.start_polling()
         except Exception as e:
@@ -38,6 +49,8 @@ class BotRunner:
 
     async def stop_bot(self):
         """Останавливает бота."""
+        global ai_bot
+
         log_info("Получен сигнал остановки бота")
         self.running = False
 
@@ -48,7 +61,8 @@ class BotRunner:
             except asyncio.CancelledError:
                 pass
 
-        await ai_bot.stop()
+        if ai_bot:
+            await ai_bot.stop()
 
     def signal_handler(self, signum, frame):
         """Обработчик сигналов системы."""
@@ -65,13 +79,24 @@ class BotRunner:
         # Инициализируем базу данных
         if config.DATABASE_URL:
             try:
+                log_info("Подключение к базе данных...")
                 init_database(config.DATABASE_URL)
-                log_info("База данных инициализирована успешно")
+
+                # Проверяем подключение
+                db_manager = get_db_manager()
+                if db_manager:
+                    log_info("База данных инициализирована успешно")
+                else:
+                    log_error("Не удалось получить менеджер базы данных")
+                    sys.exit(1)
+
             except Exception as e:
                 log_error(f"Ошибка инициализации базы данных: {str(e)}")
+                log_error("Проверьте DATABASE_URL и доступность PostgreSQL сервера")
                 sys.exit(1)
         else:
-            log_error("DATABASE_URL не установлена")
+            log_error("DATABASE_URL не установлена в переменных окружения")
+            log_error("Добавьте DATABASE_URL в Railway Variables")
             sys.exit(1)
 
         # Настраиваем обработчики сигналов
