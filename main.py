@@ -12,6 +12,7 @@ from typing import Optional
 from config import config
 from logger import logger, log_info, log_error
 from bot import ai_bot
+from database import init_database
 # Whisper больше не используется - все через Gemini API
 
 
@@ -59,6 +60,18 @@ class BotRunner:
         # Проверяем конфигурацию
         if not config.validate_config():
             log_error("Конфигурация не прошла валидацию. Завершение работы.")
+            sys.exit(1)
+
+        # Инициализируем базу данных
+        if config.DATABASE_URL:
+            try:
+                init_database(config.DATABASE_URL)
+                log_info("База данных инициализирована успешно")
+            except Exception as e:
+                log_error(f"Ошибка инициализации базы данных: {str(e)}")
+                sys.exit(1)
+        else:
+            log_error("DATABASE_URL не установлена")
             sys.exit(1)
 
         # Настраиваем обработчики сигналов
