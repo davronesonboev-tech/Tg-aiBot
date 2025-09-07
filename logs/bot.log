@@ -1,0 +1,738 @@
+2025-09-07 21:37:34 - telegram_ai_bot - INFO - Загрузка модели Whisper: small
+2025-09-07 21:38:34 - telegram_ai_bot - ERROR - Ошибка при загрузке модели Whisper: Requested float16 compute type, but the target device or backend do not support efficient float16 computation.
+2025-09-07 21:38:34 - telegram_ai_bot - INFO - Запуск Telegram AI бота...
+2025-09-07 21:38:34 - telegram_ai_bot - INFO - Запуск бота в режиме polling
+2025-09-07 21:43:42 - telegram_ai_bot - INFO - Загрузка модели Whisper: small
+2025-09-07 21:43:45 - telegram_ai_bot - ERROR - Ошибка при загрузке модели Whisper: Requested float16 compute type, but the target device or backend do not support efficient float16 computation.
+2025-09-07 21:43:45 - telegram_ai_bot - INFO - Запуск Telegram AI бота...
+2025-09-07 21:43:45 - telegram_ai_bot - INFO - Запуск бота в режиме polling
+2025-09-07 21:44:36 - telegram_ai_bot - INFO - Получен сигнал: 2
+2025-09-07 21:44:36 - telegram_ai_bot - INFO - Получен сигнал остановки бота
+2025-09-07 21:44:36 - telegram_ai_bot - INFO - Остановка бота
+2025-09-07 21:52:26 - telegram_ai_bot - INFO - Загрузка модели Whisper: small
+2025-09-07 21:52:26 - telegram_ai_bot - INFO - Попытка загрузки модели на GPU с compute_type=int8
+2025-09-07 21:52:30 - telegram_ai_bot - INFO - Модель Whisper успешно загружена на GPU
+2025-09-07 21:52:30 - telegram_ai_bot - INFO - Запуск Telegram AI бота...
+2025-09-07 21:52:30 - telegram_ai_bot - INFO - Запуск бота в режиме polling
+2025-09-07 21:53:04 - telegram_ai_bot - INFO - Получен сигнал: 2
+2025-09-07 21:53:04 - telegram_ai_bot - INFO - Получен сигнал остановки бота
+2025-09-07 21:53:05 - telegram_ai_bot - INFO - Остановка бота
+2025-09-07 21:53:34 - telegram_ai_bot - INFO - Загрузка модели Whisper: small
+2025-09-07 21:53:34 - telegram_ai_bot - INFO - Попытка загрузки модели на GPU с compute_type=int8
+2025-09-07 21:53:38 - telegram_ai_bot - INFO - Модель Whisper успешно загружена на GPU
+2025-09-07 21:53:38 - telegram_ai_bot - INFO - Запуск Telegram AI бота...
+2025-09-07 21:53:38 - telegram_ai_bot - INFO - Запуск бота в режиме polling
+2025-09-07 21:54:49 - telegram_ai_bot - INFO - [User 1395804259] Получена команда /start
+2025-09-07 21:55:03 - telegram_ai_bot - INFO - [User 1395804259] Получено текстовое сообщение: Привет...
+2025-09-07 21:55:03 - telegram_ai_bot - INFO - Генерация ответа на текстовый запрос: Привет...
+2025-09-07 21:55:03 - telegram_ai_bot - INFO - Отправка запроса к Gemini API: https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro-002:generateContent
+2025-09-07 21:55:04 - telegram_ai_bot - INFO - Успешно получен ответ от Gemini API
+2025-09-07 21:55:04 - telegram_ai_bot - INFO - [User 1395804259] Отправлен ответ на текстовое сообщение
+2025-09-07 21:55:09 - telegram_ai_bot - INFO - [User 1395804259] Получено текстовое сообщение: Нормального...
+2025-09-07 21:55:09 - telegram_ai_bot - INFO - Генерация ответа на текстовый запрос: Нормального...
+2025-09-07 21:55:09 - telegram_ai_bot - INFO - Отправка запроса к Gemini API: https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro-002:generateContent
+2025-09-07 21:55:12 - telegram_ai_bot - INFO - Успешно получен ответ от Gemini API
+2025-09-07 21:55:12 - telegram_ai_bot - INFO - [User 1395804259] Отправлен ответ на текстовое сообщение
+2025-09-07 21:55:23 - telegram_ai_bot - INFO - [User 1395804259] Получено текстовое сообщение: Сорян...
+2025-09-07 21:55:23 - telegram_ai_bot - INFO - Генерация ответа на текстовый запрос: Сорян...
+2025-09-07 21:55:23 - telegram_ai_bot - INFO - Отправка запроса к Gemini API: https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro-002:generateContent
+2025-09-07 21:55:25 - telegram_ai_bot - INFO - Успешно получен ответ от Gemini API
+2025-09-07 21:55:25 - telegram_ai_bot - INFO - [User 1395804259] Отправлен ответ на текстовое сообщение
+2025-09-07 21:55:31 - telegram_ai_bot - INFO - [User 1395804259] Получено текстовое сообщение: Ты гемини?...
+2025-09-07 21:55:31 - telegram_ai_bot - INFO - Генерация ответа на текстовый запрос: Ты гемини?...
+2025-09-07 21:55:31 - telegram_ai_bot - INFO - Отправка запроса к Gemini API: https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro-002:generateContent
+2025-09-07 21:55:32 - telegram_ai_bot - INFO - Успешно получен ответ от Gemini API
+2025-09-07 21:55:32 - telegram_ai_bot - INFO - [User 1395804259] Отправлен ответ на текстовое сообщение
+2025-09-07 21:55:41 - telegram_ai_bot - INFO - [User 1395804259] Получено текстовое сообщение: Нихуя се...
+2025-09-07 21:55:41 - telegram_ai_bot - INFO - Генерация ответа на текстовый запрос: Нихуя се...
+2025-09-07 21:55:41 - telegram_ai_bot - INFO - Отправка запроса к Gemini API: https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro-002:generateContent
+2025-09-07 21:55:44 - telegram_ai_bot - INFO - Успешно получен ответ от Gemini API
+2025-09-07 21:55:44 - telegram_ai_bot - INFO - [User 1395804259] Отправлен ответ на текстовое сообщение
+2025-09-07 21:55:55 - telegram_ai_bot - INFO - [User 1395804259] Получено текстовое сообщение: Вай ну сорян...
+2025-09-07 21:55:55 - telegram_ai_bot - INFO - Генерация ответа на текстовый запрос: Вай ну сорян...
+2025-09-07 21:55:55 - telegram_ai_bot - INFO - Отправка запроса к Gemini API: https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro-002:generateContent
+2025-09-07 21:55:59 - telegram_ai_bot - INFO - Успешно получен ответ от Gemini API
+2025-09-07 21:55:59 - telegram_ai_bot - INFO - [User 1395804259] Отправлен ответ на текстовое сообщение
+2025-09-07 21:56:12 - telegram_ai_bot - INFO - [User 1395804259] Получено сообщение с изображением
+2025-09-07 21:56:13 - telegram_ai_bot - INFO - Анализ изображения, размер: 59601 байт
+2025-09-07 21:56:13 - telegram_ai_bot - INFO - Отправка запроса к Gemini API: https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro-002:generateContent
+2025-09-07 21:56:23 - telegram_ai_bot - INFO - Успешно проанализировано изображение
+2025-09-07 21:56:23 - telegram_ai_bot - INFO - [User 1395804259] Отправлен анализ изображения
+2025-09-07 21:56:44 - telegram_ai_bot - INFO - [User 1395804259] Получено голосовое сообщение
+2025-09-07 21:56:45 - telegram_ai_bot - INFO - Распознавание аудио файла, размер: 30979 байт
+2025-09-07 21:59:19 - telegram_ai_bot - INFO - Загрузка модели Whisper: small
+2025-09-07 21:59:19 - telegram_ai_bot - INFO - Попытка загрузки модели на GPU с compute_type=int8
+2025-09-07 21:59:26 - telegram_ai_bot - INFO - Модель Whisper успешно загружена на GPU
+2025-09-07 21:59:26 - telegram_ai_bot - INFO - Запуск Telegram AI бота...
+2025-09-07 21:59:26 - telegram_ai_bot - INFO - Запуск бота в режиме polling
+2025-09-07 22:02:10 - telegram_ai_bot - INFO - Получен сигнал: 2
+2025-09-07 22:02:10 - telegram_ai_bot - INFO - Получен сигнал остановки бота
+2025-09-07 22:02:10 - telegram_ai_bot - INFO - Остановка бота
+2025-09-07 22:02:34 - telegram_ai_bot - INFO - Загрузка модели Whisper: small
+2025-09-07 22:02:34 - telegram_ai_bot - INFO - Попытка загрузки модели на GPU с compute_type=int8
+2025-09-07 22:02:37 - telegram_ai_bot - INFO - Модель Whisper успешно загружена на GPU
+2025-09-07 22:02:37 - telegram_ai_bot - INFO - Запуск Telegram AI бота...
+2025-09-07 22:02:37 - telegram_ai_bot - INFO - Запуск бота в режиме polling
+2025-09-07 22:02:51 - telegram_ai_bot - INFO - [User 1395804259] Получено голосовое сообщение
+2025-09-07 22:03:12 - telegram_ai_bot - INFO - Распознавание аудио файла, размер: 54875 байт
+2025-09-07 22:03:12 - telegram_ai_bot - WARNING - Не удалось распознать текст в аудио
+2025-09-07 22:03:12 - telegram_ai_bot - ERROR - [User 1395804259] Не удалось распознать текст в голосовом сообщении
+2025-09-07 22:03:24 - telegram_ai_bot - INFO - [User 1395804259] Получено голосовое сообщение
+2025-09-07 22:03:57 - telegram_ai_bot - INFO - Распознавание аудио файла, размер: 32627 байт
+2025-09-07 22:06:17 - telegram_ai_bot - INFO - Запуск Telegram AI бота...
+2025-09-07 22:06:17 - telegram_ai_bot - INFO - Запуск бота в режиме polling
+2025-09-07 22:09:17 - telegram_ai_bot - INFO - Получен сигнал: 2
+2025-09-07 22:09:17 - telegram_ai_bot - INFO - Получен сигнал остановки бота
+2025-09-07 22:09:17 - telegram_ai_bot - INFO - Остановка бота
+2025-09-07 22:09:35 - telegram_ai_bot - INFO - Запуск Telegram AI бота...
+2025-09-07 22:09:35 - telegram_ai_bot - INFO - Запуск бота в режиме polling
+2025-09-07 22:09:52 - telegram_ai_bot - INFO - [User 1395804259] Получена команда /start
+2025-09-07 22:09:58 - telegram_ai_bot - INFO - [User 1395804259] Получено голосовое сообщение
+2025-09-07 22:09:58 - telegram_ai_bot - INFO - Распознавание речи через Gemini, размер: 24387 байт
+2025-09-07 22:09:58 - telegram_ai_bot - INFO - Отправка запроса к Gemini API: https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro-002:generateContent
+2025-09-07 22:10:00 - telegram_ai_bot - INFO - Успешно распознана речь через Gemini
+2025-09-07 22:10:00 - telegram_ai_bot - INFO - [User 1395804259] Распознан текст из голосового через Gemini: Привет, как дела?...
+2025-09-07 22:10:00 - telegram_ai_bot - INFO - Генерация ответа на текстовый запрос: Привет, как дела?...
+2025-09-07 22:10:00 - telegram_ai_bot - INFO - Отправка запроса к Gemini API: https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro-002:generateContent
+2025-09-07 22:10:02 - telegram_ai_bot - INFO - Успешно получен ответ от Gemini API
+2025-09-07 22:10:02 - telegram_ai_bot - INFO - [User 1395804259] Отправлен ответ на голосовое сообщение
+2025-09-07 22:10:10 - telegram_ai_bot - INFO - [User 1395804259] Получено голосовое сообщение
+2025-09-07 22:10:11 - telegram_ai_bot - INFO - Распознавание речи через Gemini, размер: 33451 байт
+2025-09-07 22:10:11 - telegram_ai_bot - INFO - Отправка запроса к Gemini API: https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro-002:generateContent
+2025-09-07 22:10:13 - telegram_ai_bot - INFO - Успешно распознана речь через Gemini
+2025-09-07 22:10:13 - telegram_ai_bot - INFO - [User 1395804259] Распознан текст из голосового через Gemini: Да нормально, вот сижу....
+2025-09-07 22:10:13 - telegram_ai_bot - INFO - Генерация ответа на текстовый запрос: Да нормально, вот сижу....
+2025-09-07 22:10:13 - telegram_ai_bot - INFO - Отправка запроса к Gemini API: https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro-002:generateContent
+2025-09-07 22:10:14 - telegram_ai_bot - INFO - Успешно получен ответ от Gemini API
+2025-09-07 22:10:14 - telegram_ai_bot - INFO - [User 1395804259] Отправлен ответ на голосовое сообщение
+2025-09-07 22:10:23 - telegram_ai_bot - INFO - [User 1395804259] Получено голосовое сообщение
+2025-09-07 22:10:24 - telegram_ai_bot - INFO - Распознавание речи через Gemini, размер: 105963 байт
+2025-09-07 22:10:24 - telegram_ai_bot - INFO - Отправка запроса к Gemini API: https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro-002:generateContent
+2025-09-07 22:10:26 - telegram_ai_bot - INFO - Успешно распознана речь через Gemini
+2025-09-07 22:10:26 - telegram_ai_bot - INFO - [User 1395804259] Распознан текст из голосового через Gemini: Бэт, ты классно читаешь аудио и перекидываешь в текст его....
+2025-09-07 22:10:26 - telegram_ai_bot - INFO - Генерация ответа на текстовый запрос: Бэт, ты классно читаешь аудио и перекидываешь в текст его....
+2025-09-07 22:10:26 - telegram_ai_bot - INFO - Отправка запроса к Gemini API: https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro-002:generateContent
+2025-09-07 22:10:28 - telegram_ai_bot - INFO - Успешно получен ответ от Gemini API
+2025-09-07 22:10:29 - telegram_ai_bot - INFO - [User 1395804259] Отправлен ответ на голосовое сообщение
+2025-09-07 22:10:39 - telegram_ai_bot - INFO - [User 1395804259] Получено голосовое сообщение
+2025-09-07 22:10:40 - telegram_ai_bot - INFO - Распознавание речи через Gemini, размер: 55699 байт
+2025-09-07 22:10:40 - telegram_ai_bot - INFO - Отправка запроса к Gemini API: https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro-002:generateContent
+2025-09-07 22:10:42 - telegram_ai_bot - INFO - Успешно распознана речь через Gemini
+2025-09-07 22:10:42 - telegram_ai_bot - INFO - [User 1395804259] Распознан текст из голосового через Gemini: Да, крутой.
+Очень крутой этаж.
+П...
+2025-09-07 22:10:42 - telegram_ai_bot - INFO - Генерация ответа на текстовый запрос: Да, крутой.
+Очень крутой этаж.
+П...
+2025-09-07 22:10:42 - telegram_ai_bot - INFO - Отправка запроса к Gemini API: https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro-002:generateContent
+2025-09-07 22:10:44 - telegram_ai_bot - INFO - Успешно получен ответ от Gemini API
+2025-09-07 22:10:44 - telegram_ai_bot - INFO - [User 1395804259] Отправлен ответ на голосовое сообщение
+2025-09-07 22:10:54 - telegram_ai_bot - INFO - [User 1395804259] Получено голосовое сообщение
+2025-09-07 22:10:54 - telegram_ai_bot - INFO - Распознавание речи через Gemini, размер: 44987 байт
+2025-09-07 22:10:54 - telegram_ai_bot - INFO - Отправка запроса к Gemini API: https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro-002:generateContent
+2025-09-07 22:10:56 - telegram_ai_bot - INFO - Успешно распознана речь через Gemini
+2025-09-07 22:10:56 - telegram_ai_bot - INFO - [User 1395804259] Распознан текст из голосового через Gemini: Не, не, не, говорю, ты крутой.
+Пи-и-и......
+2025-09-07 22:10:56 - telegram_ai_bot - INFO - Генерация ответа на текстовый запрос: Не, не, не, говорю, ты крутой.
+Пи-и-и......
+2025-09-07 22:10:56 - telegram_ai_bot - INFO - Отправка запроса к Gemini API: https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro-002:generateContent
+2025-09-07 22:10:58 - telegram_ai_bot - INFO - Успешно получен ответ от Gemini API
+2025-09-07 22:10:59 - telegram_ai_bot - INFO - [User 1395804259] Отправлен ответ на голосовое сообщение
+2025-09-07 22:15:05 - telegram_ai_bot - INFO - Получен сигнал: 2
+2025-09-07 22:15:05 - telegram_ai_bot - INFO - Получен сигнал остановки бота
+2025-09-07 22:15:05 - telegram_ai_bot - INFO - Остановка бота
+2025-09-07 22:16:19 - telegram_ai_bot - INFO - Запуск Telegram AI бота...
+2025-09-07 22:16:19 - telegram_ai_bot - INFO - Запуск бота в режиме polling
+2025-09-07 22:17:20 - telegram_ai_bot - INFO - Получен сигнал: 2
+2025-09-07 22:17:20 - telegram_ai_bot - INFO - Получен сигнал остановки бота
+2025-09-07 22:17:21 - telegram_ai_bot - INFO - Остановка бота
+2025-09-07 22:18:19 - telegram_ai_bot - INFO - Запуск Telegram AI бота...
+2025-09-07 22:18:19 - telegram_ai_bot - INFO - Запуск бота в режиме polling
+2025-09-07 22:48:01 - telegram_ai_bot - INFO - Получен сигнал: 2
+2025-09-07 22:48:01 - telegram_ai_bot - INFO - Получен сигнал остановки бота
+2025-09-07 22:48:02 - telegram_ai_bot - INFO - Остановка бота
+2025-09-07 22:49:49 - telegram_ai_bot - INFO - Запуск Telegram AI бота...
+2025-09-07 22:49:49 - telegram_ai_bot - INFO - Запуск бота в режиме polling
+2025-09-07 22:50:20 - telegram_ai_bot - INFO - Получен сигнал: 2
+2025-09-07 22:50:20 - telegram_ai_bot - INFO - Получен сигнал остановки бота
+2025-09-07 22:50:21 - telegram_ai_bot - INFO - Остановка бота
+2025-09-07 22:52:07 - telegram_ai_bot - INFO - Запуск Telegram AI бота...
+2025-09-07 22:52:07 - telegram_ai_bot - INFO - Запуск бота в режиме polling
+2025-09-07 22:52:09 - telegram_ai_bot - INFO - Получен сигнал: 2
+2025-09-07 22:52:09 - telegram_ai_bot - INFO - Получен сигнал остановки бота
+2025-09-07 22:52:09 - telegram_ai_bot - INFO - Остановка бота
+2025-09-07 22:52:29 - telegram_ai_bot - INFO - Запуск Telegram AI бота...
+2025-09-07 22:52:29 - telegram_ai_bot - INFO - Запуск бота в режиме polling
+2025-09-07 22:52:47 - telegram_ai_bot - INFO - [User 1395804259] Получена команда /start
+2025-09-07 22:52:54 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: game_dice
+2025-09-07 22:52:57 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: dice_high
+2025-09-07 22:52:57 - telegram_ai_bot - ERROR - [User 1395804259] Ошибка при обработке callback dice_high: 'GameService' object has no attribute 'play_dice_game'
+Traceback (most recent call last):
+  File "C:\Users\Kolos\Desktop\wwe\bot.py", line 584, in handle_callback
+    result = game_service.play_dice_game(bet)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'GameService' object has no attribute 'play_dice_game'
+2025-09-07 22:52:59 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: dice_medium
+2025-09-07 22:52:59 - telegram_ai_bot - ERROR - [User 1395804259] Ошибка при обработке callback dice_medium: 'GameService' object has no attribute 'play_dice_game'
+Traceback (most recent call last):
+  File "C:\Users\Kolos\Desktop\wwe\bot.py", line 584, in handle_callback
+    result = game_service.play_dice_game(bet)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'GameService' object has no attribute 'play_dice_game'
+2025-09-07 22:53:00 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: dice_low
+2025-09-07 22:53:00 - telegram_ai_bot - ERROR - [User 1395804259] Ошибка при обработке callback dice_low: 'GameService' object has no attribute 'play_dice_game'
+Traceback (most recent call last):
+  File "C:\Users\Kolos\Desktop\wwe\bot.py", line 584, in handle_callback
+    result = game_service.play_dice_game(bet)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'GameService' object has no attribute 'play_dice_game'
+2025-09-07 22:53:02 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: menu_games
+2025-09-07 22:53:04 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: game_rps
+2025-09-07 22:53:05 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: rps_ножницы
+2025-09-07 22:53:13 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: game_ball
+2025-09-07 22:53:18 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: back_to_main
+2025-09-07 22:53:21 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: tool_weather
+2025-09-07 22:53:23 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: tool_weather
+2025-09-07 22:53:23 - telegram_ai_bot - ERROR - [User 1395804259] Ошибка при обработке callback tool_weather: Telegram server says - Bad Request: message is not modified: specified new message content and reply markup are exactly the same as a current content and reply markup of the message
+Traceback (most recent call last):
+  File "C:\Users\Kolos\Desktop\wwe\bot.py", line 635, in handle_callback
+    await callback.message.edit_text(
+  File "C:\Program Files\Python311\Lib\site-packages\aiogram\methods\base.py", line 84, in emit
+    return await bot(self)
+           ^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python311\Lib\site-packages\aiogram\client\bot.py", line 485, in __call__
+    return await self.session(self, method, timeout=request_timeout)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python311\Lib\site-packages\aiogram\client\session\base.py", line 254, in __call__
+    return cast(TelegramType, await middleware(bot, method))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python311\Lib\site-packages\aiogram\client\session\aiohttp.py", line 189, in make_request
+    response = self.check_response(
+               ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python311\Lib\site-packages\aiogram\client\session\base.py", line 120, in check_response
+    raise TelegramBadRequest(method=method, message=description)
+aiogram.exceptions.TelegramBadRequest: Telegram server says - Bad Request: message is not modified: specified new message content and reply markup are exactly the same as a current content and reply markup of the message
+2025-09-07 22:53:25 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: tool_calc
+2025-09-07 22:53:27 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: tool_translate
+2025-09-07 22:53:41 - telegram_ai_bot - INFO - Получен сигнал: 2
+2025-09-07 22:53:41 - telegram_ai_bot - INFO - Получен сигнал остановки бота
+2025-09-07 22:53:41 - telegram_ai_bot - INFO - Остановка бота
+2025-09-07 22:57:19 - telegram_ai_bot - INFO - Запуск Telegram AI бота...
+2025-09-07 22:57:19 - telegram_ai_bot - INFO - Запуск бота в режиме polling
+2025-09-07 22:58:06 - telegram_ai_bot - INFO - Получен сигнал: 2
+2025-09-07 22:58:06 - telegram_ai_bot - INFO - Получен сигнал остановки бота
+2025-09-07 22:58:06 - telegram_ai_bot - INFO - Остановка бота
+2025-09-07 22:58:25 - telegram_ai_bot - INFO - Запуск Telegram AI бота...
+2025-09-07 22:58:25 - telegram_ai_bot - INFO - Запуск бота в режиме polling
+2025-09-07 22:58:32 - telegram_ai_bot - INFO - [User 1395804259] Получена команда /start
+2025-09-07 22:58:35 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: menu_games
+2025-09-07 22:58:37 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: game_dice
+2025-09-07 22:58:39 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: dice_medium
+2025-09-07 22:58:39 - telegram_ai_bot - ERROR - [User 1395804259] Ошибка при обработке callback dice_medium: 'GameService' object has no attribute 'play_dice_game'
+Traceback (most recent call last):
+  File "C:\Users\Kolos\Desktop\wwe\bot.py", line 569, in handle_callback
+    result = game_service.play_dice_game(bet)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'GameService' object has no attribute 'play_dice_game'
+2025-09-07 22:58:41 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: dice_low
+2025-09-07 22:58:41 - telegram_ai_bot - ERROR - [User 1395804259] Ошибка при обработке callback dice_low: 'GameService' object has no attribute 'play_dice_game'
+Traceback (most recent call last):
+  File "C:\Users\Kolos\Desktop\wwe\bot.py", line 569, in handle_callback
+    result = game_service.play_dice_game(bet)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'GameService' object has no attribute 'play_dice_game'
+2025-09-07 22:58:42 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: dice_high
+2025-09-07 22:58:42 - telegram_ai_bot - ERROR - [User 1395804259] Ошибка при обработке callback dice_high: 'GameService' object has no attribute 'play_dice_game'
+Traceback (most recent call last):
+  File "C:\Users\Kolos\Desktop\wwe\bot.py", line 569, in handle_callback
+    result = game_service.play_dice_game(bet)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'GameService' object has no attribute 'play_dice_game'
+2025-09-07 22:58:59 - telegram_ai_bot - INFO - Получен сигнал: 2
+2025-09-07 22:58:59 - telegram_ai_bot - INFO - Получен сигнал остановки бота
+2025-09-07 22:58:59 - telegram_ai_bot - INFO - Остановка бота
+2025-09-07 22:59:40 - telegram_ai_bot - INFO - Запуск Telegram AI бота...
+2025-09-07 22:59:40 - telegram_ai_bot - INFO - Запуск бота в режиме polling
+2025-09-07 22:59:55 - telegram_ai_bot - INFO - Получен сигнал: 2
+2025-09-07 22:59:55 - telegram_ai_bot - INFO - Получен сигнал остановки бота
+2025-09-07 22:59:55 - telegram_ai_bot - INFO - Остановка бота
+2025-09-07 23:00:17 - telegram_ai_bot - INFO - Запуск Telegram AI бота...
+2025-09-07 23:00:17 - telegram_ai_bot - INFO - Запуск бота в режиме polling
+2025-09-07 23:00:25 - telegram_ai_bot - INFO - [User 1395804259] Получена команда /start
+2025-09-07 23:00:26 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: game_dice
+2025-09-07 23:00:28 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: dice_medium
+2025-09-07 23:00:28 - telegram_ai_bot - ERROR - [User 1395804259] Ошибка при обработке callback dice_medium: 'GameService' object has no attribute 'play_dice_game'
+Traceback (most recent call last):
+  File "C:\Users\Kolos\Desktop\wwe\bot.py", line 569, in handle_callback
+    result = game_service.play_dice_game(bet)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'GameService' object has no attribute 'play_dice_game'
+2025-09-07 23:00:30 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: dice_low
+2025-09-07 23:00:30 - telegram_ai_bot - ERROR - [User 1395804259] Ошибка при обработке callback dice_low: 'GameService' object has no attribute 'play_dice_game'
+Traceback (most recent call last):
+  File "C:\Users\Kolos\Desktop\wwe\bot.py", line 569, in handle_callback
+    result = game_service.play_dice_game(bet)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'GameService' object has no attribute 'play_dice_game'
+2025-09-07 23:00:31 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: dice_high
+2025-09-07 23:00:31 - telegram_ai_bot - ERROR - [User 1395804259] Ошибка при обработке callback dice_high: 'GameService' object has no attribute 'play_dice_game'
+Traceback (most recent call last):
+  File "C:\Users\Kolos\Desktop\wwe\bot.py", line 569, in handle_callback
+    result = game_service.play_dice_game(bet)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'GameService' object has no attribute 'play_dice_game'
+2025-09-07 23:00:32 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: menu_games
+2025-09-07 23:00:46 - telegram_ai_bot - INFO - Получен сигнал: 2
+2025-09-07 23:00:46 - telegram_ai_bot - INFO - Получен сигнал остановки бота
+2025-09-07 23:00:46 - telegram_ai_bot - INFO - Остановка бота
+2025-09-07 23:03:13 - telegram_ai_bot - INFO - Запуск Telegram AI бота...
+2025-09-07 23:03:13 - telegram_ai_bot - INFO - Запуск бота в режиме polling
+2025-09-07 23:03:28 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: game_dice
+2025-09-07 23:03:30 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: dice_medium
+2025-09-07 23:03:36 - telegram_ai_bot - INFO - Получен сигнал: 2
+2025-09-07 23:03:36 - telegram_ai_bot - INFO - Получен сигнал остановки бота
+2025-09-07 23:03:37 - telegram_ai_bot - INFO - Остановка бота
+2025-09-07 23:08:01 - telegram_ai_bot - INFO - Запуск Telegram AI бота...
+2025-09-07 23:08:01 - telegram_ai_bot - INFO - Запуск бота в режиме polling
+2025-09-07 23:08:11 - telegram_ai_bot - INFO - [User 1395804259] Получена команда /start
+2025-09-07 23:08:17 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: menu_personas
+2025-09-07 23:08:19 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: persona_programmer
+2025-09-07 23:08:19 - telegram_ai_bot - INFO - Создана новая память для пользователя 1395804259
+2025-09-07 23:08:27 - telegram_ai_bot - INFO - [User 1395804259] Получено текстовое сообщение: Привет...
+2025-09-07 23:08:27 - telegram_ai_bot - INFO - Добавлено сообщение в память пользователя 1395804259: user - Привет...
+2025-09-07 23:08:27 - telegram_ai_bot - INFO - Генерация ответа на текстовый запрос: Контекст предыдущего разговора:
+Пользователь: Привет
+
+Текущее сообщение пользователя: Привет...
+2025-09-07 23:08:27 - telegram_ai_bot - INFO - Отправка запроса к Gemini API: https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro-002:generateContent
+2025-09-07 23:08:29 - telegram_ai_bot - INFO - Успешно получен ответ от Gemini API
+2025-09-07 23:08:29 - telegram_ai_bot - INFO - [User 1395804259] Отправлен ответ на текстовое сообщение
+2025-09-07 23:08:29 - telegram_ai_bot - INFO - Добавлено сообщение в память пользователя 1395804259: assistant - Привет ещё раз!  Чем могу помочь сегодня?  Готов о...
+2025-09-07 23:08:45 - telegram_ai_bot - INFO - [User 1395804259] Получено текстовое сообщение: а какой ты модель?...
+2025-09-07 23:08:45 - telegram_ai_bot - INFO - Добавлено сообщение в память пользователя 1395804259: user - а какой ты модель?...
+2025-09-07 23:08:45 - telegram_ai_bot - INFO - Генерация ответа на текстовый запрос: Контекст предыдущего разговора:
+Пользователь: Привет
+ИИ: Привет ещё раз!  Чем могу помочь сегодня?  ...
+2025-09-07 23:08:45 - telegram_ai_bot - INFO - Отправка запроса к Gemini API: https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro-002:generateContent
+2025-09-07 23:08:53 - telegram_ai_bot - INFO - Успешно получен ответ от Gemini API
+2025-09-07 23:08:53 - telegram_ai_bot - INFO - [User 1395804259] Отправлен ответ на текстовое сообщение
+2025-09-07 23:08:53 - telegram_ai_bot - INFO - Добавлено сообщение в память пользователя 1395804259: assistant - Я — большая языковая модель, обученная Javohir Zok...
+2025-09-07 23:09:15 - telegram_ai_bot - INFO - [User 1395804259] Получено текстовое сообщение: а Javohir крутой...
+2025-09-07 23:09:15 - telegram_ai_bot - INFO - Добавлено сообщение в память пользователя 1395804259: user - а Javohir крутой...
+2025-09-07 23:09:15 - telegram_ai_bot - INFO - Генерация ответа на текстовый запрос: Контекст предыдущего разговора:
+Пользователь: Привет
+ИИ: Привет ещё раз!  Чем могу помочь сегодня?  ...
+2025-09-07 23:09:15 - telegram_ai_bot - INFO - Отправка запроса к Gemini API: https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro-002:generateContent
+2025-09-07 23:09:18 - telegram_ai_bot - INFO - Успешно получен ответ от Gemini API
+2025-09-07 23:09:19 - telegram_ai_bot - INFO - [User 1395804259] Отправлен ответ на текстовое сообщение
+2025-09-07 23:09:19 - telegram_ai_bot - INFO - Добавлено сообщение в память пользователя 1395804259: assistant - Да, Javohir Zokirjonov, мой создатель, очень талан...
+2025-09-07 23:09:31 - telegram_ai_bot - INFO - [User 1395804259] Получена команда /start
+2025-09-07 23:09:36 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: menu_games
+2025-09-07 23:09:39 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: game_rps
+2025-09-07 23:09:41 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: rps_камень
+2025-09-07 23:09:46 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: game_rps
+2025-09-07 23:09:47 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: rps_ножницы
+2025-09-07 23:09:54 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: game_rps
+2025-09-07 23:09:55 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: rps_бумага
+2025-09-07 23:09:58 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: game_rps
+2025-09-07 23:09:59 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: rps_камень
+2025-09-07 23:10:01 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: game_rps
+2025-09-07 23:10:02 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: rps_ножницы
+2025-09-07 23:10:07 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: game_dice
+2025-09-07 23:10:08 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: dice_high
+2025-09-07 23:10:12 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: game_dice
+2025-09-07 23:10:13 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: dice_high
+2025-09-07 23:10:20 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: game_guess
+2025-09-07 23:10:24 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: guess_medium
+2025-09-07 23:11:28 - telegram_ai_bot - INFO - Получен сигнал: 2
+2025-09-07 23:11:28 - telegram_ai_bot - INFO - Получен сигнал остановки бота
+2025-09-07 23:11:29 - telegram_ai_bot - INFO - Остановка бота
+2025-09-07 23:13:43 - telegram_ai_bot - INFO - Загружены воспоминания для 1 пользователей
+2025-09-07 23:13:43 - telegram_ai_bot - INFO - Запуск Telegram AI бота...
+2025-09-07 23:13:43 - telegram_ai_bot - INFO - Запуск бота в режиме polling
+2025-09-07 23:13:56 - telegram_ai_bot - INFO - Получен сигнал: 2
+2025-09-07 23:13:56 - telegram_ai_bot - INFO - Получен сигнал остановки бота
+2025-09-07 23:13:56 - telegram_ai_bot - INFO - Остановка бота
+2025-09-07 23:14:20 - telegram_ai_bot - INFO - Загружены воспоминания для 1 пользователей
+2025-09-07 23:14:20 - telegram_ai_bot - INFO - Запуск Telegram AI бота...
+2025-09-07 23:14:20 - telegram_ai_bot - INFO - Запуск бота в режиме polling
+2025-09-07 23:14:28 - telegram_ai_bot - INFO - [User 1395804259] Получена команда /start
+2025-09-07 23:14:34 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: menu_games
+2025-09-07 23:14:35 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: back_to_main
+2025-09-07 23:14:37 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: game_dice
+2025-09-07 23:14:39 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: menu_games
+2025-09-07 23:14:40 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: back_to_main
+2025-09-07 23:14:44 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: menu_games
+2025-09-07 23:14:53 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: game_guess
+2025-09-07 23:14:54 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: guess_medium
+2025-09-07 23:14:54 - telegram_ai_bot - ERROR - [User 1395804259] Ошибка при обработке callback guess_medium: 'game_state'
+Traceback (most recent call last):
+  File "C:\Users\Kolos\Desktop\wwe\bot.py", line 586, in handle_callback
+    memory_manager.set_user_active_game(user_id, "guess_number", {
+  File "C:\Users\Kolos\Desktop\wwe\memory.py", line 293, in set_user_active_game
+    memory.set_active_game(game_type, game_data)
+  File "C:\Users\Kolos\Desktop\wwe\memory.py", line 114, in set_active_game
+    self.metadata['game_state']['active_game'] = game_type
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^
+KeyError: 'game_state'
+2025-09-07 23:14:58 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: guess_hard
+2025-09-07 23:14:58 - telegram_ai_bot - ERROR - [User 1395804259] Ошибка при обработке callback guess_hard: 'game_state'
+Traceback (most recent call last):
+  File "C:\Users\Kolos\Desktop\wwe\bot.py", line 586, in handle_callback
+    memory_manager.set_user_active_game(user_id, "guess_number", {
+  File "C:\Users\Kolos\Desktop\wwe\memory.py", line 293, in set_user_active_game
+    memory.set_active_game(game_type, game_data)
+  File "C:\Users\Kolos\Desktop\wwe\memory.py", line 114, in set_active_game
+    self.metadata['game_state']['active_game'] = game_type
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^
+KeyError: 'game_state'
+2025-09-07 23:15:08 - telegram_ai_bot - INFO - Получен сигнал: 2
+2025-09-07 23:15:08 - telegram_ai_bot - INFO - Получен сигнал остановки бота
+2025-09-07 23:15:08 - telegram_ai_bot - INFO - Остановка бота
+2025-09-07 23:16:12 - telegram_ai_bot - INFO - Загружены воспоминания для 1 пользователей
+2025-09-07 23:16:12 - telegram_ai_bot - INFO - Запуск Telegram AI бота...
+2025-09-07 23:16:12 - telegram_ai_bot - INFO - Запуск бота в режиме polling
+2025-09-07 23:16:50 - telegram_ai_bot - INFO - Получен сигнал: 2
+2025-09-07 23:16:50 - telegram_ai_bot - INFO - Получен сигнал остановки бота
+2025-09-07 23:16:50 - telegram_ai_bot - INFO - Остановка бота
+2025-09-07 23:17:22 - telegram_ai_bot - INFO - Загружены воспоминания для 1 пользователей
+2025-09-07 23:17:22 - telegram_ai_bot - INFO - Запуск Telegram AI бота...
+2025-09-07 23:17:22 - telegram_ai_bot - INFO - Запуск бота в режиме polling
+2025-09-07 23:17:26 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: guess_medium
+2025-09-07 23:17:26 - telegram_ai_bot - ERROR - Ошибка при сохранении воспоминаний: Object of type datetime is not JSON serializable
+2025-09-07 23:17:33 - telegram_ai_bot - INFO - [User 1395804259] Получено текстовое сообщение: 35...
+2025-09-07 23:17:37 - telegram_ai_bot - INFO - [User 1395804259] Получено текстовое сообщение: 25...
+2025-09-07 23:17:40 - telegram_ai_bot - INFO - [User 1395804259] Получено текстовое сообщение: 10...
+2025-09-07 23:17:43 - telegram_ai_bot - INFO - [User 1395804259] Получено текстовое сообщение: 15...
+2025-09-07 23:17:48 - telegram_ai_bot - INFO - [User 1395804259] Получено текстовое сообщение: 18...
+2025-09-07 23:17:52 - telegram_ai_bot - INFO - [User 1395804259] Получено текстовое сообщение: 22...
+2025-09-07 23:17:56 - telegram_ai_bot - INFO - [User 1395804259] Получено текстовое сообщение: 24...
+2025-09-07 23:17:56 - telegram_ai_bot - ERROR - Ошибка при сохранении воспоминаний: Object of type datetime is not JSON serializable
+2025-09-07 23:18:12 - telegram_ai_bot - INFO - [User 1395804259] Получена команда /start
+2025-09-07 23:18:13 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: menu_games
+2025-09-07 23:18:16 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: game_quiz
+2025-09-07 23:18:16 - telegram_ai_bot - ERROR - Ошибка при сохранении воспоминаний: Object of type datetime is not JSON serializable
+2025-09-07 23:18:26 - telegram_ai_bot - INFO - [User 1395804259] Получено текстовое сообщение: 2...
+2025-09-07 23:18:37 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: game_quiz
+2025-09-07 23:18:37 - telegram_ai_bot - ERROR - Ошибка при сохранении воспоминаний: Object of type datetime is not JSON serializable
+2025-09-07 23:18:42 - telegram_ai_bot - INFO - [User 1395804259] Получено текстовое сообщение: 5...
+2025-09-07 23:18:42 - telegram_ai_bot - INFO - Добавлено сообщение в память пользователя 1395804259: user - 5...
+2025-09-07 23:18:42 - telegram_ai_bot - ERROR - Ошибка при сохранении воспоминаний: Object of type datetime is not JSON serializable
+2025-09-07 23:18:43 - telegram_ai_bot - INFO - Генерация ответа на текстовый запрос: Контекст предыдущего разговора:
+ИИ: Привет ещё раз!  Чем могу помочь сегодня?  Готов обсуждать код, ...
+2025-09-07 23:18:43 - telegram_ai_bot - INFO - Отправка запроса к Gemini API: https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro-002:generateContent
+2025-09-07 23:18:45 - telegram_ai_bot - INFO - Успешно получен ответ от Gemini API
+2025-09-07 23:18:45 - telegram_ai_bot - INFO - [User 1395804259] Отправлен ответ на текстовое сообщение
+2025-09-07 23:18:45 - telegram_ai_bot - INFO - Добавлено сообщение в память пользователя 1395804259: assistant - Пять! 🙌  Отличное число!  Что ты хочешь с ним сдел...
+2025-09-07 23:18:45 - telegram_ai_bot - ERROR - Ошибка при сохранении воспоминаний: Object of type datetime is not JSON serializable
+2025-09-07 23:18:57 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: back_to_main
+2025-09-07 23:18:59 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: menu_games
+2025-09-07 23:19:01 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: game_quiz
+2025-09-07 23:19:01 - telegram_ai_bot - ERROR - Ошибка при сохранении воспоминаний: Object of type datetime is not JSON serializable
+2025-09-07 23:19:20 - telegram_ai_bot - INFO - [User 1395804259] Получено текстовое сообщение: 1...
+2025-09-07 23:19:20 - telegram_ai_bot - ERROR - Ошибка при сохранении воспоминаний: Object of type datetime is not JSON serializable
+2025-09-07 23:19:29 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: game_ball
+2025-09-07 23:19:29 - telegram_ai_bot - ERROR - Ошибка при сохранении воспоминаний: Object of type datetime is not JSON serializable
+2025-09-07 23:19:45 - telegram_ai_bot - INFO - [User 1395804259] Получено текстовое сообщение: Завтра пойду ли я на универ?...
+2025-09-07 23:19:45 - telegram_ai_bot - ERROR - Ошибка при сохранении воспоминаний: Object of type datetime is not JSON serializable
+2025-09-07 23:20:00 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: game_ball
+2025-09-07 23:20:00 - telegram_ai_bot - ERROR - Ошибка при сохранении воспоминаний: Object of type datetime is not JSON serializable
+2025-09-07 23:20:00 - telegram_ai_bot - ERROR - Ошибка при редактировании сообщения: Telegram server says - Bad Request: message is not modified: specified new message content and reply markup are exactly the same as a current content and reply markup of the message
+2025-09-07 23:20:13 - telegram_ai_bot - INFO - [User 1395804259] Получено текстовое сообщение: Пойду ли я на универ завтра?...
+2025-09-07 23:20:13 - telegram_ai_bot - ERROR - Ошибка при сохранении воспоминаний: Object of type datetime is not JSON serializable
+2025-09-07 23:20:22 - telegram_ai_bot - INFO - [User 1395804259] Получена команда /start
+2025-09-07 23:20:25 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: menu_games
+2025-09-07 23:20:26 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: back_to_main
+2025-09-07 23:20:28 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: menu_tools
+2025-09-07 23:20:31 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: tool_weather
+2025-09-07 23:21:30 - telegram_ai_bot - INFO - Получен сигнал: 2
+2025-09-07 23:21:30 - telegram_ai_bot - INFO - Получен сигнал остановки бота
+2025-09-07 23:21:30 - telegram_ai_bot - INFO - Остановка бота
+2025-09-07 23:24:11 - telegram_ai_bot - ERROR - Ошибка при загрузке воспоминаний: Expecting value: line 62 column 27 (char 3682)
+2025-09-07 23:24:39 - telegram_ai_bot - INFO - Запуск Telegram AI бота...
+2025-09-07 23:24:39 - telegram_ai_bot - INFO - Запуск бота в режиме polling
+2025-09-07 23:26:55 - telegram_ai_bot - INFO - Получен сигнал: 2
+2025-09-07 23:26:55 - telegram_ai_bot - INFO - Получен сигнал остановки бота
+2025-09-07 23:26:55 - telegram_ai_bot - INFO - Остановка бота
+2025-09-07 23:27:43 - telegram_ai_bot - INFO - Запуск Telegram AI бота...
+2025-09-07 23:27:43 - telegram_ai_bot - INFO - Запуск бота в режиме polling
+2025-09-07 23:27:49 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: tool_weather
+2025-09-07 23:27:49 - telegram_ai_bot - ERROR - Ошибка при редактировании сообщения: Telegram server says - Bad Request: message is not modified: specified new message content and reply markup are exactly the same as a current content and reply markup of the message
+2025-09-07 23:27:51 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: back_to_main
+2025-09-07 23:27:56 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: menu_tools
+2025-09-07 23:27:57 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: tool_weather
+2025-09-07 23:28:02 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: tool_weather
+2025-09-07 23:28:03 - telegram_ai_bot - ERROR - Ошибка при редактировании сообщения: Telegram server says - Bad Request: message is not modified: specified new message content and reply markup are exactly the same as a current content and reply markup of the message
+2025-09-07 23:28:05 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: fun_joke
+2025-09-07 23:28:09 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: tool_calc
+2025-09-07 23:28:13 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: tool_weather
+2025-09-07 23:31:17 - telegram_ai_bot - INFO - Запуск Telegram AI бота...
+2025-09-07 23:31:17 - telegram_ai_bot - INFO - Запуск бота в режиме polling
+2025-09-07 23:32:03 - telegram_ai_bot - INFO - Получен сигнал: 2
+2025-09-07 23:32:03 - telegram_ai_bot - INFO - Получен сигнал остановки бота
+2025-09-07 23:32:03 - telegram_ai_bot - INFO - Остановка бота
+2025-09-07 23:32:09 - telegram_ai_bot - INFO - Получен сигнал: 2
+2025-09-07 23:32:09 - telegram_ai_bot - INFO - Получен сигнал остановки бота
+2025-09-07 23:32:10 - telegram_ai_bot - INFO - Остановка бота
+2025-09-07 23:32:26 - telegram_ai_bot - INFO - Запуск Telegram AI бота...
+2025-09-07 23:32:26 - telegram_ai_bot - INFO - Запуск бота в режиме polling
+2025-09-07 23:32:31 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: tool_weather
+2025-09-07 23:32:40 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: weather_tashkent
+2025-09-07 23:32:40 - telegram_ai_bot - INFO - Запрос погоды для города: Ташкент
+2025-09-07 23:32:40 - telegram_ai_bot - INFO - [User 1395804259] Показана погода для Ташкент
+2025-09-07 23:32:50 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: weather_andijan
+2025-09-07 23:32:50 - telegram_ai_bot - INFO - Запрос погоды для города: Андижан
+2025-09-07 23:32:50 - telegram_ai_bot - INFO - [User 1395804259] Показана погода для Андижан
+2025-09-07 23:32:52 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: weather_bukhara
+2025-09-07 23:32:52 - telegram_ai_bot - INFO - Запрос погоды для города: Бухара
+2025-09-07 23:32:52 - telegram_ai_bot - INFO - [User 1395804259] Показана погода для Бухара
+2025-09-07 23:32:52 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: weather_tashkent
+2025-09-07 23:32:52 - telegram_ai_bot - INFO - Запрос погоды для города: Ташкент
+2025-09-07 23:32:53 - telegram_ai_bot - INFO - [User 1395804259] Показана погода для Ташкент
+2025-09-07 23:32:55 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: weather_tashkent
+2025-09-07 23:32:55 - telegram_ai_bot - INFO - Запрос погоды для города: Ташкент
+2025-09-07 23:32:55 - telegram_ai_bot - INFO - [User 1395804259] Показана погода для Ташкент
+2025-09-07 23:32:56 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: weather_tashkent
+2025-09-07 23:32:56 - telegram_ai_bot - INFO - Запрос погоды для города: Ташкент
+2025-09-07 23:32:56 - telegram_ai_bot - INFO - [User 1395804259] Показана погода для Ташкент
+2025-09-07 23:32:57 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: weather_tashkent
+2025-09-07 23:32:57 - telegram_ai_bot - INFO - Запрос погоды для города: Ташкент
+2025-09-07 23:32:57 - telegram_ai_bot - INFO - [User 1395804259] Показана погода для Ташкент
+2025-09-07 23:32:58 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: weather_tashkent
+2025-09-07 23:32:58 - telegram_ai_bot - INFO - Запрос погоды для города: Ташкент
+2025-09-07 23:32:58 - telegram_ai_bot - INFO - [User 1395804259] Показана погода для Ташкент
+2025-09-07 23:32:58 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: weather_tashkent
+2025-09-07 23:32:58 - telegram_ai_bot - INFO - Запрос погоды для города: Ташкент
+2025-09-07 23:32:58 - telegram_ai_bot - INFO - [User 1395804259] Показана погода для Ташкент
+2025-09-07 23:33:01 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: weather_bukhara
+2025-09-07 23:33:01 - telegram_ai_bot - INFO - Запрос погоды для города: Бухара
+2025-09-07 23:33:02 - telegram_ai_bot - INFO - [User 1395804259] Показана погода для Бухара
+2025-09-07 23:33:02 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: weather_tashkent
+2025-09-07 23:33:02 - telegram_ai_bot - INFO - Запрос погоды для города: Ташкент
+2025-09-07 23:33:02 - telegram_ai_bot - INFO - [User 1395804259] Показана погода для Ташкент
+2025-09-07 23:33:02 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: weather_jizzakh
+2025-09-07 23:33:02 - telegram_ai_bot - INFO - Запрос погоды для города: Джизак
+2025-09-07 23:33:02 - telegram_ai_bot - INFO - [User 1395804259] Показана погода для Джизак
+2025-09-07 23:33:58 - telegram_ai_bot - INFO - Получен сигнал: 2
+2025-09-07 23:33:58 - telegram_ai_bot - INFO - Получен сигнал остановки бота
+2025-09-07 23:33:58 - telegram_ai_bot - INFO - Остановка бота
+2025-09-07 23:34:59 - telegram_ai_bot - INFO - Запуск Telegram AI бота...
+2025-09-07 23:34:59 - telegram_ai_bot - INFO - Запуск бота в режиме polling
+2025-09-07 23:36:52 - telegram_ai_bot - INFO - Получен сигнал: 2
+2025-09-07 23:36:52 - telegram_ai_bot - INFO - Получен сигнал остановки бота
+2025-09-07 23:36:52 - telegram_ai_bot - INFO - Остановка бота
+2025-09-07 23:37:25 - telegram_ai_bot - INFO - Запуск Telegram AI бота...
+2025-09-07 23:37:25 - telegram_ai_bot - INFO - Запуск бота в режиме polling
+2025-09-07 23:37:29 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: menu_tools
+2025-09-07 23:37:30 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: tool_weather
+2025-09-07 23:37:32 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: weather_tashkent
+2025-09-07 23:37:32 - telegram_ai_bot - INFO - Запрос реальной погоды для города: Ташкент
+2025-09-07 23:37:32 - telegram_ai_bot - INFO - [User 1395804259] Показана погода для Ташкент
+2025-09-07 23:37:37 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: weather_tashkent
+2025-09-07 23:37:37 - telegram_ai_bot - INFO - Запрос реальной погоды для города: Ташкент
+2025-09-07 23:37:38 - telegram_ai_bot - ERROR - Ошибка при редактировании сообщения: Telegram server says - Bad Request: message is not modified: specified new message content and reply markup are exactly the same as a current content and reply markup of the message
+2025-09-07 23:37:38 - telegram_ai_bot - INFO - [User 1395804259] Показана погода для Ташкент
+2025-09-07 23:37:40 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: weather_andijan
+2025-09-07 23:37:40 - telegram_ai_bot - INFO - Запрос реальной погоды для города: Андижан
+2025-09-07 23:37:40 - telegram_ai_bot - INFO - [User 1395804259] Показана погода для Андижан
+2025-09-07 23:37:41 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: weather_tashkent
+2025-09-07 23:37:41 - telegram_ai_bot - INFO - Запрос реальной погоды для города: Ташкент
+2025-09-07 23:37:42 - telegram_ai_bot - INFO - [User 1395804259] Показана погода для Ташкент
+2025-09-07 23:37:46 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: menu_tools
+2025-09-07 23:37:50 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: tool_translate
+2025-09-07 23:37:58 - telegram_ai_bot - INFO - Получен сигнал: 2
+2025-09-07 23:37:58 - telegram_ai_bot - INFO - Получен сигнал остановки бота
+2025-09-07 23:37:58 - telegram_ai_bot - INFO - Остановка бота
+2025-09-07 23:40:39 - telegram_ai_bot - INFO - Запуск Telegram AI бота...
+2025-09-07 23:40:39 - telegram_ai_bot - INFO - Запуск бота в режиме polling
+2025-09-07 23:41:34 - telegram_ai_bot - INFO - Получен сигнал: 2
+2025-09-07 23:41:34 - telegram_ai_bot - INFO - Получен сигнал остановки бота
+2025-09-07 23:41:34 - telegram_ai_bot - INFO - Остановка бота
+2025-09-07 23:42:06 - telegram_ai_bot - INFO - Запуск Telegram AI бота...
+2025-09-07 23:42:06 - telegram_ai_bot - INFO - Запуск бота в режиме polling
+2025-09-07 23:42:14 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: back_to_main
+2025-09-07 23:42:20 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: menu_tools
+2025-09-07 23:42:22 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: tool_translate
+2025-09-07 23:42:35 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: lang_uz
+2025-09-07 23:42:35 - telegram_ai_bot - INFO - Создана новая память для пользователя 1395804259
+2025-09-07 23:42:35 - telegram_ai_bot - ERROR - Ошибка при сохранении воспоминаний: Object of type datetime is not JSON serializable
+2025-09-07 23:42:35 - telegram_ai_bot - INFO - [User 1395804259] Пользователь 1395804259 выбрал язык для перевода: uz
+2025-09-07 23:42:49 - telegram_ai_bot - INFO - [User 1395804259] Получено текстовое сообщение: Привет мир...
+2025-09-07 23:42:49 - telegram_ai_bot - INFO - Перевод текста на uz: Привет мир...
+2025-09-07 23:42:50 - telegram_ai_bot - ERROR - Ошибка при сохранении воспоминаний: Object of type datetime is not JSON serializable
+2025-09-07 23:42:50 - telegram_ai_bot - INFO - [User 1395804259] Выполнен перевод на uz: Привет мир...
+2025-09-07 23:43:13 - telegram_ai_bot - INFO - Получен сигнал: 2
+2025-09-07 23:43:13 - telegram_ai_bot - INFO - Получен сигнал остановки бота
+2025-09-07 23:43:13 - telegram_ai_bot - INFO - Остановка бота
+2025-09-07 23:43:32 - telegram_ai_bot - ERROR - Ошибка при загрузке воспоминаний: Expecting value: line 13 column 27 (char 350)
+2025-09-07 23:43:32 - telegram_ai_bot - INFO - Запуск Telegram AI бота...
+2025-09-07 23:43:32 - telegram_ai_bot - INFO - Запуск бота в режиме polling
+2025-09-07 23:45:34 - telegram_ai_bot - INFO - Получен сигнал: 2
+2025-09-07 23:45:34 - telegram_ai_bot - INFO - Получен сигнал остановки бота
+2025-09-07 23:45:34 - telegram_ai_bot - INFO - Остановка бота
+2025-09-07 23:46:00 - telegram_ai_bot - INFO - Запуск Telegram AI бота...
+2025-09-07 23:46:00 - telegram_ai_bot - INFO - Запуск бота в режиме polling
+2025-09-07 23:46:00 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: menu_tools
+2025-09-07 23:46:04 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: back_to_main
+2025-09-07 23:46:06 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: menu_tools
+2025-09-07 23:46:08 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: tool_translate
+2025-09-07 23:46:10 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: lang_uz
+2025-09-07 23:46:10 - telegram_ai_bot - INFO - Создана новая память для пользователя 1395804259
+2025-09-07 23:46:10 - telegram_ai_bot - ERROR - Ошибка при сохранении воспоминаний: Object of type datetime is not JSON serializable
+2025-09-07 23:46:10 - telegram_ai_bot - INFO - [User 1395804259] Пользователь 1395804259 выбрал язык для перевода: uz
+2025-09-07 23:46:19 - telegram_ai_bot - INFO - [User 1395804259] Получено текстовое сообщение: Как дела?...
+2025-09-07 23:46:19 - telegram_ai_bot - INFO - Перевод текста на uz: Как дела?...
+2025-09-07 23:46:19 - telegram_ai_bot - ERROR - Ошибка при сохранении воспоминаний: Object of type datetime is not JSON serializable
+2025-09-07 23:46:20 - telegram_ai_bot - INFO - [User 1395804259] Выполнен перевод на uz: Как дела?...
+2025-09-07 23:46:28 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: menu_tools
+2025-09-07 23:46:37 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: fun_fact
+2025-09-07 23:46:41 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: back_to_main
+2025-09-07 23:46:49 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: clear_memory
+2025-09-07 23:46:53 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: confirm_clear_memory
+2025-09-07 23:46:53 - telegram_ai_bot - INFO - Очищена память пользователя 1395804259
+2025-09-07 23:46:59 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: menu_personas
+2025-09-07 23:47:00 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: back_to_main
+2025-09-07 23:47:11 - telegram_ai_bot - INFO - Получен сигнал: 2
+2025-09-07 23:47:11 - telegram_ai_bot - INFO - Получен сигнал остановки бота
+2025-09-07 23:47:11 - telegram_ai_bot - INFO - Остановка бота
+2025-09-07 23:50:54 - telegram_ai_bot - INFO - Загружены воспоминания для 0 пользователей
+2025-09-07 23:50:54 - telegram_ai_bot - INFO - Запуск Telegram AI бота...
+2025-09-07 23:50:54 - telegram_ai_bot - INFO - Запуск бота в режиме polling
+2025-09-07 23:50:58 - telegram_ai_bot - INFO - Получен сигнал: 2
+2025-09-07 23:50:58 - telegram_ai_bot - INFO - Получен сигнал остановки бота
+2025-09-07 23:50:58 - telegram_ai_bot - INFO - Остановка бота
+2025-09-07 23:51:46 - telegram_ai_bot - INFO - Загружены воспоминания для 0 пользователей
+2025-09-07 23:51:46 - telegram_ai_bot - INFO - Запуск Telegram AI бота...
+2025-09-07 23:51:46 - telegram_ai_bot - INFO - Запуск бота в режиме polling
+2025-09-07 23:52:00 - telegram_ai_bot - INFO - [User 1395804259] Получена команда /start
+2025-09-07 23:52:41 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: help
+2025-09-07 23:52:58 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: menu_tools
+2025-09-07 23:53:01 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: fun_joke
+2025-09-07 23:53:12 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: fun_fact
+2025-09-07 23:53:15 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: fun_joke
+2025-09-07 23:53:16 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: fun_joke
+2025-09-07 23:53:18 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: fun_joke
+2025-09-07 23:53:18 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: fun_joke
+2025-09-07 23:53:19 - telegram_ai_bot - ERROR - Ошибка при редактировании сообщения: Telegram server says - Bad Request: message is not modified: specified new message content and reply markup are exactly the same as a current content and reply markup of the message
+2025-09-07 23:53:20 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: fun_joke
+2025-09-07 23:53:25 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: fun_joke
+2025-09-07 23:53:28 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: fun_joke
+2025-09-07 23:53:28 - telegram_ai_bot - ERROR - Ошибка при редактировании сообщения: Telegram server says - Bad Request: message is not modified: specified new message content and reply markup are exactly the same as a current content and reply markup of the message
+2025-09-07 23:53:30 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: fun_joke
+2025-09-07 23:53:33 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: fun_joke
+2025-09-07 23:53:35 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: fun_joke
+2025-09-07 23:53:39 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: fun_joke
+2025-09-07 23:53:42 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: fun_joke
+2025-09-07 23:53:42 - telegram_ai_bot - ERROR - Ошибка при редактировании сообщения: Telegram server says - Bad Request: message is not modified: specified new message content and reply markup are exactly the same as a current content and reply markup of the message
+2025-09-07 23:53:44 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: fun_joke
+2025-09-07 23:53:59 - telegram_ai_bot - INFO - Получен сигнал: 2
+2025-09-07 23:53:59 - telegram_ai_bot - INFO - Получен сигнал остановки бота
+2025-09-07 23:53:59 - telegram_ai_bot - INFO - Остановка бота
+2025-09-07 23:56:46 - telegram_ai_bot - INFO - Загружены воспоминания для 0 пользователей
+2025-09-07 23:56:46 - telegram_ai_bot - INFO - Запуск Telegram AI бота...
+2025-09-07 23:56:46 - telegram_ai_bot - INFO - Запуск бота в режиме polling
+2025-09-07 23:57:05 - telegram_ai_bot - INFO - Получен сигнал: 2
+2025-09-07 23:57:05 - telegram_ai_bot - INFO - Получен сигнал остановки бота
+2025-09-07 23:57:05 - telegram_ai_bot - INFO - Остановка бота
+2025-09-07 23:57:13 - telegram_ai_bot - INFO - Загружены воспоминания для 0 пользователей
+2025-09-07 23:57:13 - telegram_ai_bot - INFO - Запуск Telegram AI бота...
+2025-09-07 23:57:13 - telegram_ai_bot - INFO - Запуск бота в режиме polling
+2025-09-07 23:57:28 - telegram_ai_bot - INFO - Загружены воспоминания для 0 пользователей
+2025-09-07 23:57:28 - telegram_ai_bot - INFO - Запуск Telegram AI бота...
+2025-09-07 23:57:28 - telegram_ai_bot - INFO - Запуск бота в режиме polling
+2025-09-07 23:57:31 - telegram_ai_bot - INFO - Получен сигнал: 2
+2025-09-07 23:57:31 - telegram_ai_bot - INFO - Получен сигнал остановки бота
+2025-09-07 23:57:32 - telegram_ai_bot - INFO - Остановка бота
+2025-09-07 23:57:33 - telegram_ai_bot - INFO - Получен сигнал: 2
+2025-09-07 23:57:33 - telegram_ai_bot - INFO - Получен сигнал остановки бота
+2025-09-07 23:57:34 - telegram_ai_bot - INFO - Остановка бота
+2025-09-07 23:57:47 - telegram_ai_bot - INFO - Загружены воспоминания для 0 пользователей
+2025-09-07 23:57:47 - telegram_ai_bot - INFO - Запуск Telegram AI бота...
+2025-09-07 23:57:47 - telegram_ai_bot - INFO - Запуск бота в режиме polling
+2025-09-07 23:58:25 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: back_to_main
+2025-09-07 23:58:27 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: menu_tools
+2025-09-07 23:58:28 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: fun_joke
+2025-09-07 23:58:28 - telegram_ai_bot - INFO - Генерация ответа на текстовый запрос: Придумай одну оригинальную и смешную шутку на русском языке.
+            Шутка должна быть:
+        ...
+2025-09-07 23:58:28 - telegram_ai_bot - INFO - Отправка запроса к Gemini API: https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro-002:generateContent
+2025-09-07 23:58:30 - telegram_ai_bot - INFO - Успешно получен ответ от Gemini API
+2025-09-07 23:58:36 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: fun_joke
+2025-09-07 23:58:36 - telegram_ai_bot - INFO - Генерация ответа на текстовый запрос: Придумай одну оригинальную и смешную шутку на русском языке.
+            Шутка должна быть:
+        ...
+2025-09-07 23:58:36 - telegram_ai_bot - INFO - Отправка запроса к Gemini API: https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro-002:generateContent
+2025-09-07 23:58:37 - telegram_ai_bot - INFO - Успешно получен ответ от Gemini API
+2025-09-07 23:58:42 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: fun_joke
+2025-09-07 23:58:42 - telegram_ai_bot - INFO - Генерация ответа на текстовый запрос: Придумай одну оригинальную и смешную шутку на русском языке.
+            Шутка должна быть:
+        ...
+2025-09-07 23:58:42 - telegram_ai_bot - INFO - Отправка запроса к Gemini API: https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro-002:generateContent
+2025-09-07 23:58:43 - telegram_ai_bot - INFO - Успешно получен ответ от Gemini API
+2025-09-07 23:58:45 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: fun_joke
+2025-09-07 23:58:45 - telegram_ai_bot - INFO - Генерация ответа на текстовый запрос: Придумай одну оригинальную и смешную шутку на русском языке.
+            Шутка должна быть:
+        ...
+2025-09-07 23:58:45 - telegram_ai_bot - INFO - Отправка запроса к Gemini API: https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro-002:generateContent
+2025-09-07 23:58:47 - telegram_ai_bot - INFO - Успешно получен ответ от Gemini API
+2025-09-07 23:58:58 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: fun_joke
+2025-09-07 23:58:58 - telegram_ai_bot - INFO - Генерация ответа на текстовый запрос: Придумай одну оригинальную и смешную шутку на русском языке.
+            Шутка должна быть:
+        ...
+2025-09-07 23:58:58 - telegram_ai_bot - INFO - Отправка запроса к Gemini API: https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro-002:generateContent
+2025-09-07 23:59:00 - telegram_ai_bot - INFO - Успешно получен ответ от Gemini API
+2025-09-07 23:59:11 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: fun_joke
+2025-09-07 23:59:11 - telegram_ai_bot - INFO - Генерация ответа на текстовый запрос: Придумай одну оригинальную и смешную шутку на русском языке.
+            Шутка должна быть:
+        ...
+2025-09-07 23:59:11 - telegram_ai_bot - INFO - Отправка запроса к Gemini API: https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro-002:generateContent
+2025-09-07 23:59:12 - telegram_ai_bot - INFO - Успешно получен ответ от Gemini API
+2025-09-08 00:00:28 - telegram_ai_bot - INFO - Загружены воспоминания для 0 пользователей
+2025-09-08 00:00:28 - telegram_ai_bot - INFO - Запуск Telegram AI бота...
+2025-09-08 00:00:28 - telegram_ai_bot - INFO - Запуск бота в режиме polling
+2025-09-08 00:02:41 - telegram_ai_bot - INFO - Получен сигнал: 2
+2025-09-08 00:02:41 - telegram_ai_bot - INFO - Получен сигнал остановки бота
+2025-09-08 00:02:42 - telegram_ai_bot - INFO - Остановка бота
+2025-09-08 00:02:46 - telegram_ai_bot - INFO - Получен сигнал: 2
+2025-09-08 00:02:46 - telegram_ai_bot - INFO - Получен сигнал остановки бота
+2025-09-08 00:02:46 - telegram_ai_bot - INFO - Остановка бота
+2025-09-08 00:03:11 - telegram_ai_bot - INFO - Загружены воспоминания для 0 пользователей
+2025-09-08 00:03:11 - telegram_ai_bot - INFO - Запуск Telegram AI бота...
+2025-09-08 00:03:11 - telegram_ai_bot - INFO - Запуск бота в режиме polling
+2025-09-08 00:03:13 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: back_to_main
+2025-09-08 00:03:16 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: menu_tools
+2025-09-08 00:03:17 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: fun_joke
+2025-09-08 00:03:17 - telegram_ai_bot - INFO - Генерация ответа на текстовый запрос: Придумай одну оригинальную и смешную шутку на русском языке про школа и образование.
+            Шут...
+2025-09-08 00:03:17 - telegram_ai_bot - INFO - Отправка запроса к Gemini API: https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro-002:generateContent
+2025-09-08 00:03:19 - telegram_ai_bot - INFO - Успешно получен ответ от Gemini API
+2025-09-08 00:03:26 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: fun_joke
+2025-09-08 00:03:26 - telegram_ai_bot - INFO - Генерация ответа на текстовый запрос: Придумай одну оригинальную и смешную шутку на русском языке про школа и образование.
+            Шут...
+2025-09-08 00:03:26 - telegram_ai_bot - INFO - Отправка запроса к Gemini API: https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro-002:generateContent
+2025-09-08 00:03:28 - telegram_ai_bot - INFO - Успешно получен ответ от Gemini API
+2025-09-08 00:03:34 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: fun_joke
+2025-09-08 00:03:34 - telegram_ai_bot - INFO - Генерация ответа на текстовый запрос: Придумай одну оригинальную и смешную шутку на русском языке про животные и природа.
+            Шутк...
+2025-09-08 00:03:34 - telegram_ai_bot - INFO - Отправка запроса к Gemini API: https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro-002:generateContent
+2025-09-08 00:03:36 - telegram_ai_bot - INFO - Успешно получен ответ от Gemini API
+2025-09-08 00:03:42 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: fun_fact
+2025-09-08 00:03:42 - telegram_ai_bot - INFO - Генерация ответа на текстовый запрос: Придумай один уникальный и удивительный факт про животные и природа.
+            Факт должен быть:
+ ...
+2025-09-08 00:03:42 - telegram_ai_bot - INFO - Отправка запроса к Gemini API: https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro-002:generateContent
+2025-09-08 00:03:44 - telegram_ai_bot - INFO - Успешно получен ответ от Gemini API
+2025-09-08 00:03:53 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: fun_quote
+2025-09-08 00:03:53 - telegram_ai_bot - INFO - Генерация ответа на текстовый запрос: Создай одну оригинальную мотивационную цитату на русском языке про успех и достижения.
+            Ц...
+2025-09-08 00:03:53 - telegram_ai_bot - INFO - Отправка запроса к Gemini API: https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro-002:generateContent
+2025-09-08 00:03:55 - telegram_ai_bot - INFO - Успешно получен ответ от Gemini API
+2025-09-08 00:03:58 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: back_to_main
+2025-09-08 00:04:06 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: stats
+2025-09-08 00:04:06 - telegram_ai_bot - INFO - Создана новая память для пользователя 1395804259
+2025-09-08 00:04:14 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: help
+2025-09-08 00:04:36 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: menu_personas
+2025-09-08 00:04:40 - telegram_ai_bot - INFO - [User 1395804259] Получен callback: back_to_main
+2025-09-08 00:05:24 - telegram_ai_bot - INFO - Получен сигнал: 2
+2025-09-08 00:05:24 - telegram_ai_bot - INFO - Получен сигнал остановки бота
+2025-09-08 00:05:24 - telegram_ai_bot - INFO - Остановка бота
