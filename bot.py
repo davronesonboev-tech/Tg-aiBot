@@ -513,6 +513,89 @@ class AIBot:
         except Exception as e:
             log_error(f"Ошибка логирования игры в кости пользователя {user_id}: {str(e)}")
 
+    async def _bot_throw_real_dice(self, callback: types.CallbackQuery, user_id: int):
+        """Бот бросает настоящий dice эмодзи через Telegram API."""
+        try:
+            # Отправляем сообщение о начале броска бота
+            await self._safe_edit_message(callback, "🎲 <b>Мой ход! Брошу кубик...</b>\n\n🤖 <i>Подготовка...</i>")
+
+            # Отправляем настоящий dice эмодзи в чат
+            dice_message = await callback.bot.send_dice(
+                chat_id=callback.message.chat.id,
+                emoji="🎲"
+            )
+
+            # Ждем завершения анимации Telegram (обычно 3-4 секунды)
+            import asyncio
+            await asyncio.sleep(4)
+
+            # Получаем результат броска бота из dice_message
+            bot_dice_value = dice_message.dice.value
+
+            # Эмодзи для кубиков
+            dice_emojis = {1: '⚀', 2: '⚁', 3: '⚂', 4: '⚃', 5: '⚄', 6: '⚅'}
+            bot_emoji = dice_emojis.get(bot_dice_value, '🎲')
+
+            # Показываем результат броска бота
+            result_text = "🎲 <b>Мой бросок завершен!</b>\n\n" \
+                         f"🤖 <b>Выпало:</b> {bot_emoji} <b>({bot_dice_value})</b>\n\n" \
+                         "🎯 <b>Теперь твоя очередь бросить настоящий кубик!</b>\n" \
+                         "Отправь эмодзи 🎲 в чат:"
+
+            # Создаем клавиатуру для пользователя
+            from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+            user_throw_keyboard = InlineKeyboardMarkup(inline_keyboard=[
+                [InlineKeyboardButton(text="🎲 Готов бросить!", callback_data=f"dice_user_throw_{bot_dice_value}")],
+                [InlineKeyboardButton(text="🔄 Новая игра", callback_data="game_dice")],
+                [InlineKeyboardButton(text="⬅️ В меню", callback_data="menu_games")]
+            ])
+
+            # Обновляем сообщение с результатом бота
+            await self._safe_edit_message(callback, result_text, user_throw_keyboard)
+
+            # Устанавливаем режим ожидания броска от пользователя
+            memory_manager.set_user_active_game(user_id, "dice_waiting", {"bot_dice": bot_dice_value})
+
+        except Exception as e:
+            # Если не получилось отправить настоящий dice, используем имитацию
+            log_error(f"Ошибка отправки настоящего dice бота: {e}")
+            await self._fallback_bot_dice_throw(callback, user_id)
+
+    async def _fallback_bot_dice_throw(self, callback: types.CallbackQuery, user_id: int):
+        """Резервный метод с имитацией броска, если настоящий dice не работает."""
+        import asyncio
+        import secrets
+
+        # Генерируем результат броска
+        bot_dice = secrets.randbelow(6) + 1
+        dice_emojis = {1: '⚀', 2: '⚁', 3: '⚂', 4: '⚃', 5: '⚄', 6: '⚅'}
+
+        # Быстрая имитация броска
+        frames = [
+            "🎲 <b>Брошу кубик...</b>\n\n🤖 <i>Крутится...</i> ⚀⚁⚂",
+            "🎲 <b>Результат:</b>\n\n🤖 <i>Выпало:</i> ⚄ (4)",
+        ]
+
+        for frame in frames:
+            await self._safe_edit_message(callback, frame)
+            await asyncio.sleep(1.5)
+
+        # Финальный результат
+        result_text = "🎲 <b>Мой бросок завершен!</b>\n\n" \
+                     f"🤖 <b>Выпало:</b> {dice_emojis[bot_dice]} <b>({bot_dice})</b>\n\n" \
+                     "🎯 <b>Теперь брось настоящий кубик!</b>\n" \
+                     "Отправь эмодзи 🎲 в чат:"
+
+        from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+        user_throw_keyboard = InlineKeyboardMarkup(inline_keyboard=[
+            [InlineKeyboardButton(text="🎲 Готов бросить!", callback_data=f"dice_user_throw_{bot_dice}")],
+            [InlineKeyboardButton(text="🔄 Новая игра", callback_data="game_dice")],
+            [InlineKeyboardButton(text="⬅️ В меню", callback_data="menu_games")]
+        ])
+
+        await self._safe_edit_message(callback, result_text, user_throw_keyboard)
+        memory_manager.set_user_active_game(user_id, "dice_waiting", {"bot_dice": bot_dice})
+
     async def cmd_game_quiz(self, message: types.Message):
         """Викторина."""
         user_id = message.from_user.id
@@ -741,35 +824,10 @@ class AIBot:
             elif callback_data == "game_dice":
                 user_id = callback.from_user.id
 
-                # Начинаем игру - сначала бот бросает кубик
-                import secrets
-                bot_dice = secrets.randbelow(6) + 1
-                dice_emojis = {1: '⚀', 2: '⚁', 3: '⚂', 4: '⚃', 5: '⚄', 6: '⚅'}
-                bot_emoji = dice_emojis.get(bot_dice, '🎲')
+                # Начинаем игру - бот отправляет настоящий dice эмодзи
+                await self._bot_throw_real_dice(callback, user_id)
 
-                game_text = "🎲 <b>Бросаем кости!</b>\n\n" \
-                           f"🤖 <b>Мой бросок:</b> {bot_emoji} <b>({bot_dice})</b>\n\n" \
-                           "🎯 <b>Теперь твоя очередь!</b>\n" \
-                           "Нажми кнопку ниже, чтобы бросить кубик:"
-
-                # Создаем клавиатуру с кнопкой броска
-                from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
-                throw_keyboard = InlineKeyboardMarkup(inline_keyboard=[
-                    [InlineKeyboardButton(text="🎲 Бросить кубик", callback_data=f"dice_throw_user_{bot_dice}")],
-                    [InlineKeyboardButton(text="🔄 Новая игра", callback_data="game_dice")],
-                    [InlineKeyboardButton(text="⬅️ В меню", callback_data="menu_games")]
-                ])
-
-                # Отправляем сообщение с результатом броска бота
-                await self._safe_edit_message(callback, game_text, throw_keyboard)
-
-                # Устанавливаем режим ожидания броска от пользователя
-                memory_manager.set_user_active_game(user_id, "dice_waiting", {"bot_dice": bot_dice})
-
-                # Убираем "часики" с кнопки
-                await callback.answer()
-
-            elif callback_data.startswith("dice_throw_user_"):
+            elif callback_data.startswith("dice_user_throw_"):
                 user_id = callback.from_user.id
 
                 # Извлекаем значение броска бота из callback_data
@@ -779,17 +837,18 @@ class AIBot:
                     await callback.answer("❌ Ошибка данных игры!")
                     return
 
-                # Теперь просим пользователя отправить настоящий dice эмодзи
-                instruction_text = f"🎲 <b>Бросаем кости!</b>\n\n" \
+                # Просим пользователя отправить настоящий dice эмодзи
+                dice_emojis = {1: '⚀', 2: '⚁', 3: '⚂', 4: '⚃', 5: '⚄', 6: '⚅'}
+                instruction_text = "🎲 <b>Твоя очередь бросить настоящий кубик!</b>\n\n" \
                                   f"🤖 <b>Мой бросок:</b> {dice_emojis.get(bot_dice, '🎲')} <b>({bot_dice})</b>\n\n" \
-                                  f"🎯 <b>Теперь брось кубик!</b>\n" \
-                                  f"Отправь настоящий эмодзи: 🎲"
+                                  "🎯 <b>Отправь эмодзи 🎲 в чат для броска!</b>\n\n" \
+                                  "Жду твой бросок..."
 
                 # Сохраняем бросок бота для сравнения
                 memory_manager.set_user_active_game(user_id, "dice_waiting", {"bot_dice": bot_dice})
 
                 # Обновляем сообщение с инструкцией
-                await self._safe_edit_message(callback, instruction_text, keyboard_manager.get_dice_game_menu())
+                await self._safe_edit_message(callback, instruction_text)
 
                 # Убираем "часики" с кнопки
                 await callback.answer()
@@ -797,31 +856,8 @@ class AIBot:
             elif callback_data == "dice_throw_again":
                 user_id = callback.from_user.id
 
-                # Повторяем игру - сначала бот бросает кубик
-                import secrets
-                bot_dice = secrets.randbelow(6) + 1
-                dice_emojis = {1: '⚀', 2: '⚁', 3: '⚂', 4: '⚃', 5: '⚄', 6: '⚅'}
-                bot_emoji = dice_emojis.get(bot_dice, '🎲')
-
-                game_text = "🎲 <b>Бросаем кости еще раз!</b>\n\n" \
-                           f"🤖 <b>Мой бросок:</b> {bot_emoji} <b>({bot_dice})</b>\n\n" \
-                           "🎯 <b>Теперь твоя очередь!</b>\n" \
-                           "Нажми кнопку ниже, чтобы бросить кубик:"
-
-                # Создаем клавиатуру с кнопкой броска
-                from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
-                throw_keyboard = InlineKeyboardMarkup(inline_keyboard=[
-                    [InlineKeyboardButton(text="🎲 Бросить кубик", callback_data=f"dice_throw_user_{bot_dice}")],
-                    [InlineKeyboardButton(text="🔄 Новая игра", callback_data="game_dice")],
-                    [InlineKeyboardButton(text="⬅️ В меню", callback_data="menu_games")]
-                ])
-
-                # Отправляем сообщение с результатом броска бота
-                await self._safe_edit_message(callback, game_text, throw_keyboard)
-
-                # Устанавливаем режим ожидания броска от пользователя
-                memory_manager.set_user_active_game(user_id, "dice_waiting", {"bot_dice": bot_dice})
-
+                # Повторяем игру - бот бросает настоящий кубик
+                await self._bot_throw_real_dice(callback, user_id)
                 await callback.answer()
 
                 # Создаем расширенное меню с историей и статистикой
