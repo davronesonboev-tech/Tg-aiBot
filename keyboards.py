@@ -119,6 +119,89 @@ class KeyboardManager:
         return builder.as_markup()
 
     @staticmethod
+    def get_quiz_settings_menu() -> InlineKeyboardMarkup:
+        """Меню настроек викторины."""
+        builder = InlineKeyboardBuilder()
+
+        builder.button(text="🎯 Выбрать отрасль", callback_data="quiz_select_industry")
+        builder.button(text="🔢 Выбрать количество вопросов", callback_data="quiz_select_count")
+        builder.button(text="🎮 Начать викторину", callback_data="quiz_start")
+        builder.button(text="⬅️ Назад в игры", callback_data="menu_games")
+
+        builder.adjust(1, 1, 1, 1)
+        return builder.as_markup()
+
+    @staticmethod
+    def get_quiz_industry_menu() -> InlineKeyboardMarkup:
+        """Меню выбора отрасли для викторины."""
+        builder = InlineKeyboardBuilder()
+
+        industries = [
+            ("🧬 Биология", "quiz_industry_биология"),
+            ("⚗️ Химия", "quiz_industry_химия"),
+            ("🧮 Математика", "quiz_industry_математика"),
+            ("⚡ Физика", "quiz_industry_физика"),
+            ("🗺️ География", "quiz_industry_география"),
+            ("📜 История", "quiz_industry_история"),
+            ("🎨 Искусство", "quiz_industry_искусство"),
+            ("⚽ Спорт", "quiz_industry_спорт"),
+            ("🎬 Кино", "quiz_industry_кино"),
+            ("📚 Литература", "quiz_industry_литература"),
+            ("🎵 Музыка", "quiz_industry_музыка"),
+            ("🧠 Психология", "quiz_industry_психология"),
+            ("💰 Экономика", "quiz_industry_экономика"),
+            ("💻 Программирование", "quiz_industry_программирование"),
+            ("🤖 ИИ", "quiz_industry_искусственный интеллект"),
+            ("🔒 Кибербезопасность", "quiz_industry_кибербезопасность"),
+            ("🩺 Медицина", "quiz_industry_медицина"),
+            ("🌌 Астрономия", "quiz_industry_астрономия")
+        ]
+
+        for text, callback_data in industries:
+            builder.button(text=text, callback_data=callback_data)
+
+        builder.button(text="🎲 Случайная отрасль", callback_data="quiz_industry_случайная")
+        builder.button(text="⬅️ Назад к настройкам", callback_data="quiz_settings")
+
+        builder.adjust(2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1)
+        return builder.as_markup()
+
+    @staticmethod
+    def get_quiz_count_menu() -> InlineKeyboardMarkup:
+        """Меню выбора количества вопросов."""
+        builder = InlineKeyboardBuilder()
+
+        builder.button(text="🔸 5 вопросов", callback_data="quiz_count_5")
+        builder.button(text="🔹 10 вопросов", callback_data="quiz_count_10")
+        builder.button(text="🔸 15 вопросов", callback_data="quiz_count_15")
+        builder.button(text="🔹 20 вопросов", callback_data="quiz_count_20")
+        builder.button(text="🔸 25 вопросов", callback_data="quiz_count_25")
+        builder.button(text="🔹 30 вопросов", callback_data="quiz_count_30")
+        builder.button(text="✏️ Свое количество", callback_data="quiz_count_custom")
+        builder.button(text="⬅️ Назад к настройкам", callback_data="quiz_settings")
+
+        builder.adjust(2, 2, 2, 2, 2, 2, 1, 1)
+        return builder.as_markup()
+
+    @staticmethod
+    def get_quiz_progress_menu(correct: int, total: int, time_left: int = 0) -> InlineKeyboardMarkup:
+        """Меню прогресса викторины."""
+        builder = InlineKeyboardBuilder()
+
+        progress_text = f"📊 {correct}/{total} правильных"
+        builder.button(text=progress_text, callback_data="quiz_progress")
+
+        if time_left > 0:
+            time_text = f"⏰ {time_left} сек"
+            builder.button(text=time_text, callback_data="quiz_time")
+
+        builder.button(text="🏁 Завершить", callback_data="quiz_finish")
+        builder.button(text="⬅️ Выйти", callback_data="menu_games")
+
+        builder.adjust(2, 1, 1)
+        return builder.as_markup()
+
+    @staticmethod
     def get_tools_menu() -> InlineKeyboardMarkup:
         """Меню инструментов."""
         builder = InlineKeyboardBuilder()
