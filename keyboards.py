@@ -90,13 +90,15 @@ class KeyboardManager:
         """Клавиатура выбора для игры камень-ножницы-бумага."""
         builder = InlineKeyboardBuilder()
 
-        builder.button(text="🪨 Камень", callback_data="rps_rock")
-        builder.button(text="✂️ Ножницы", callback_data="rps_scissors")
-        builder.button(text="📄 Бумага", callback_data="rps_paper")
+        builder.button(text="🪨 Камень", callback_data="rps_камень")
+        builder.button(text="✂️ Ножницы", callback_data="rps_ножницы")
+        builder.button(text="📄 Бумага", callback_data="rps_бумага")
 
+        builder.button(text="📊 Статистика", callback_data="rps_stats")
+        builder.button(text="📚 История", callback_data="rps_history")
         builder.button(text="⬅️ Назад в игры", callback_data="menu_games")
 
-        builder.adjust(3, 1)
+        builder.adjust(3, 3, 1)
         return builder.as_markup()
 
     @staticmethod
@@ -272,6 +274,30 @@ class KeyboardManager:
 
         builder.adjust(3, 1)  # 3 кнопки выбора, затем назад
 
+        return builder.as_markup()
+
+    @staticmethod
+    def get_rps_stats_menu() -> InlineKeyboardMarkup:
+        """Меню статистики для игры камень-ножницы-бумага."""
+        builder = InlineKeyboardBuilder()
+
+        builder.button(text="📚 История", callback_data="rps_history")
+        builder.button(text="🪨 Сыграть", callback_data="game_rps")
+        builder.button(text="⬅️ Назад в игры", callback_data="menu_games")
+
+        builder.adjust(2, 1)
+        return builder.as_markup()
+
+    @staticmethod
+    def get_rps_history_menu() -> InlineKeyboardMarkup:
+        """Меню истории для игры камень-ножницы-бумага."""
+        builder = InlineKeyboardBuilder()
+
+        builder.button(text="📊 Статистика", callback_data="rps_stats")
+        builder.button(text="🪨 Сыграть", callback_data="game_rps")
+        builder.button(text="⬅️ Назад в игры", callback_data="menu_games")
+
+        builder.adjust(2, 1)
         return builder.as_markup()
 
     @staticmethod
