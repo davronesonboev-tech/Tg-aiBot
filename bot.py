@@ -614,44 +614,36 @@ class AIBot:
                 await self._safe_edit_message(callback, history_text, keyboard_manager.get_rps_history_menu())
 
             elif callback_data == "game_dice":
-                new_text = "🎲 <b>Игра в кости</b>\n\n🎯 <b>Как играть:</b>\n" \
-                          "1. Я брошу кубик 🎲\n" \
-                          "2. Ты бросаешь кубик 🎲\n" \
-                          "3. Сравниваем результаты!\n\n" \
-                          "💡 <i>Используй настоящий :game_die: эмодзи</i>"
-                await self._safe_edit_message(callback, new_text, keyboard_manager.get_dice_start_menu())
-
-            elif callback_data == "dice_start":
                 user_id = callback.from_user.id
 
-                # Показываем инструкцию и просим пользователя бросить кубик
-                instruction_text = "🎲 <b>Бросаем кубики!</b>\n\n" \
-                                  "🤖 Я бросаю кубик...\n\n" \
-                                  "🎯 <b>Твоя очередь!</b>\n" \
-                                  "Отправь мне: 🎲 (или просто брось кубик)"
+                # Начинаем игру сразу
+                game_text = "🎲 <b>Бросаем кости!</b>\n\n" \
+                           "🎯 <b>Твоя очередь бросить кубик!</b>\n" \
+                           "Отправь мне: 🎲"
 
                 # Отправляем сообщение с инструкцией
-                await self._safe_edit_message(callback, instruction_text, keyboard_manager.get_dice_waiting_menu())
+                await self._safe_edit_message(callback, game_text, keyboard_manager.get_dice_game_menu())
 
                 # Устанавливаем режим ожидания броска кубика от пользователя
                 memory_manager.set_user_active_game(user_id, "dice_waiting", {"waiting_for_dice": True})
 
-            elif callback_data == "dice_bot_throw":
+                # Убираем "часики" с кнопки
+                await callback.answer()
+
+            elif callback_data == "dice_throw_again":
                 user_id = callback.from_user.id
 
-                # Бот "бросает" кубик (показываем анимацию)
-                await callback.answer("🎲 Брошу кубик!")
+                # Повторяем игру
+                game_text = "🎲 <b>Бросаем кости еще раз!</b>\n\n" \
+                           "🎯 <b>Твоя очередь бросить кубик!</b>\n" \
+                           "Отправь мне: 🎲"
 
-                # Имитируем бросок кубика ботом (в реальности нужно отправить :game_die:)
-                import secrets
-                bot_dice = secrets.randbelow(6) + 1
+                await self._safe_edit_message(callback, game_text, keyboard_manager.get_dice_game_menu())
 
-                bot_throw_text = f"🤖 <b>Мой бросок:</b> 🎲\n\n" \
-                                f"Выпало: <b>{bot_dice}</b>\n\n" \
-                                f"🎯 <b>Теперь твоя очередь!</b>\n" \
-                                f"Брось кубик: 🎲"
+                # Устанавливаем режим ожидания
+                memory_manager.set_user_active_game(user_id, "dice_waiting", {"waiting_for_dice": True})
 
-                await self._safe_edit_message(callback, bot_throw_text, keyboard_manager.get_dice_user_turn_menu())
+                await callback.answer()
 
                 # Создаем расширенное меню с историей и статистикой
                 dice_menu = keyboard_manager.get_games_menu()
@@ -1725,26 +1717,37 @@ class AIBot:
                 # Проверяем, бросил ли пользователь кубик
                 if text.strip() == "🎲" or "game_die" in text.lower():
                     # Пользователь бросил кубик
-                    import secrets
-                    user_dice = secrets.randbelow(6) + 1  # Имитируем результат броска
 
-                    # Получаем данные о броске бота из памяти
-                    game_data = memory_manager.get_user_game_data(user_id)
-                    bot_dice = game_data.get('bot_dice', secrets.randbelow(6) + 1) if game_data else secrets.randbelow(6) + 1
+                    # Имитируем бросок пользователя (в реальности нужно получить от Telegram)
+                    import secrets
+                    user_dice = secrets.randbelow(6) + 1  # 1-6
+
+                    # Бот тоже бросает кубик
+                    bot_dice = secrets.randbelow(6) + 1  # 1-6
 
                     # Определяем победителя
                     if user_dice > bot_dice:
-                        result = "🎉 Ты победил! 🎲"
+                        result = "🏆 <b>Ты победил!</b>"
                         winner = "user"
+                        extra_msg = "🎯 Отличный бросок!"
                     elif user_dice < bot_dice:
-                        result = "😢 Я победил! 🎲"
+                        result = "😎 <b>Я выиграл!</b>"
                         winner = "bot"
+                        extra_msg = "🤖 Я был лучше!"
                     else:
-                        result = "🤝 Ничья! 🎲"
+                        result = "🤝 <b>Ничья!</b>"
                         winner = "draw"
+                        extra_msg = "⚖️ Равные силы!"
+
+                    # Эмодзи для кубиков
+                    dice_emojis = {1: '⚀', 2: '⚁', 3: '⚂', 4: '⚃', 5: '⚄', 6: '⚅'}
 
                     # Создаем красивый результат
-                    result_text = game_service._GameService__format_real_dice_result(user_dice, bot_dice, result, winner)
+                    result_text = f"🎲 <b>Результаты бросков:</b>\n\n" \
+                                 f"🎯 <b>Твой кубик:</b> {dice_emojis.get(user_dice, '🎲')} <b>({user_dice})</b>\n" \
+                                 f"🤖 <b>Мой кубик:</b> {dice_emojis.get(bot_dice, '🎲')} <b>({bot_dice})</b>\n\n" \
+                                 f"{result}\n" \
+                                 f"<i>{extra_msg}</i>"
 
                     # Очищаем режим игры
                     memory_manager.clear_user_active_game(user_id)
@@ -1752,7 +1755,7 @@ class AIBot:
                     # Показываем результат и меню для продолжения
                     from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
                     continue_menu = InlineKeyboardMarkup(inline_keyboard=[
-                        [InlineKeyboardButton(text="🎲 Сыграть еще", callback_data="game_dice")],
+                        [InlineKeyboardButton(text="🎲 Сыграть еще", callback_data="dice_throw_again")],
                         [InlineKeyboardButton(text="📊 Статистика", callback_data="dice_stats")],
                         [InlineKeyboardButton(text="📚 История", callback_data="dice_history")],
                         [InlineKeyboardButton(text="⬅️ В меню", callback_data="menu_main")]
