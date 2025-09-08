@@ -383,18 +383,31 @@ class GameService:
         min_val, max_val = ranges.get(difficulty, (1, 100))
         number = random.randint(min_val, max_val)
 
-        # Генерируем интересную подсказку через Gemini
+        # Генерируем интересную подсказку через Gemini (без раскрытия точного числа)
         try:
-            hint_prompt = f"Дай одну короткую и интересную подсказку или факт про число {number}. Максимум 2 предложения на русском языке."
+            # Создаем подсказку на основе диапазона, а не конкретного числа
+            if difficulty == 'easy':
+                range_hint = "число от 1 до 10"
+            elif difficulty == 'medium':
+                range_hint = "число от 1 до 100"
+            else:  # hard
+                range_hint = "число от 1 до 1000"
+
+            hint_prompt = f"Дай одну короткую и интересную подсказку для игры 'Угадай число' в диапазоне {range_hint}. Подсказка должна быть общей, без конкретных чисел. Максимум 1-2 предложения на русском языке."
             hint = gemini_client.generate_text_response(hint_prompt)
             if hint:
                 hint = hint.strip()
+                # Убираем любые цифры из подсказки, чтобы не раскрывать число
+                import re
+                hint = re.sub(r'\d+', '', hint)
                 if len(hint) > 100:
                     hint = hint[:100] + "..."
+                elif len(hint) < 10:
+                    hint = "Попробуй угадать методом половинного деления!"
             else:
-                hint = "Это число имеет свою уникальную историю!"
+                hint = "Попробуй угадать методом половинного деления!"
         except Exception as e:
-            print(f"Ошибка генерации подсказки для числа {number}: {e}")
+            print(f"Ошибка генерации подсказки для диапазона {difficulty}: {e}")
             hint = "Попробуй угадать методом половинного деления!"
 
         difficulty_names = {
