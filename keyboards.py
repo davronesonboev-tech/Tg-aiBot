@@ -232,19 +232,45 @@ class KeyboardManager:
         return builder.as_markup()
 
     @staticmethod
-    def get_dice_bet_menu() -> InlineKeyboardMarkup:
-        """Меню выбора ставки для игры в кости."""
+    def get_dice_start_menu() -> InlineKeyboardMarkup:
+        """Меню начала игры в кости."""
         builder = InlineKeyboardBuilder()
 
-        builder.button(text="🎯 Низкая (1-6)", callback_data="dice_low")
-        builder.button(text="🎲 Средняя (7-12)", callback_data="dice_medium")
-        builder.button(text="💎 Высокая (13-18)", callback_data="dice_high")
-        builder.button(text="⚡ Ультра (19-24)", callback_data="dice_ultra")
-        builder.button(text="👑 Легендарная (25-30)", callback_data="dice_legendary")
+        builder.button(text="🎲 Начать игру", callback_data="dice_start")
+        builder.button(text="📊 Статистика", callback_data="dice_stats")
+        builder.button(text="📚 История", callback_data="dice_history")
 
         builder.button(text="⬅️ Назад в игры", callback_data="menu_games")
 
-        builder.adjust(1, 1, 1, 1, 1, 2)
+        builder.adjust(2, 1, 1)
+
+        return builder.as_markup()
+
+    @staticmethod
+    def get_dice_waiting_menu() -> InlineKeyboardMarkup:
+        """Меню ожидания броска кубика."""
+        builder = InlineKeyboardBuilder()
+
+        builder.button(text="🎲 Я бросил!", callback_data="dice_user_threw")
+        builder.button(text="🔄 Начать заново", callback_data="game_dice")
+
+        builder.button(text="⬅️ В меню", callback_data="menu_games")
+
+        builder.adjust(2, 1)
+
+        return builder.as_markup()
+
+    @staticmethod
+    def get_dice_user_turn_menu() -> InlineKeyboardMarkup:
+        """Меню хода пользователя."""
+        builder = InlineKeyboardBuilder()
+
+        builder.button(text="🎲 Бросить кубик", callback_data="dice_user_throw")
+        builder.button(text="🔄 Начать заново", callback_data="game_dice")
+
+        builder.button(text="⬅️ В меню", callback_data="menu_games")
+
+        builder.adjust(2, 1)
 
         return builder.as_markup()
 
