@@ -561,6 +561,74 @@ class GameService:
 
         return None
 
+    def generate_quiz_question_specific(self, industry: str) -> Optional[Dict[str, Any]]:
+        """
+        Генерирует вопрос викторины по конкретной отрасли.
+
+        Args:
+            industry: Отрасль знаний для вопроса
+
+        Returns:
+            Dict с вопросом, вариантами ответов и правильным ответом или None при ошибке
+        """
+        try:
+            prompt = f"""Создай один уникальный и интересный вопрос викторины на тему "{industry}" на русском языке.
+
+Требования:
+1. Вопрос должен быть сложным, но интересным и соответствовать теме "{industry}"
+2. В начале вопроса укажи отрасль в скобках, например: ({industry.capitalize()})
+3. Дай 4 варианта ответа (1, 2, 3, 4)
+4. Только один правильный ответ
+5. Варианты ответов должны быть разными по длине и сложности
+6. Укажи номер правильного ответа
+7. Добавь подробную подсказку с интересными фактами
+
+Формат ответа:
+Вопрос: [вопрос с указанием отрасли]
+1. [вариант 1]
+2. [вариант 2]
+3. [вариант 3]
+4. [вариант 4]
+Правильный ответ: [номер]
+Подсказка: [подробная подсказка с фактами]"""
+
+            response = gemini_client.generate_text_response(prompt)
+
+            if response:
+                # Парсим ответ Gemini
+                lines = response.strip().split('\n')
+                question = ""
+                options = []
+                correct_answer = ""
+                hint = ""
+
+                current_section = ""
+                for line in lines:
+                    line = line.strip()
+                    if line.startswith('Вопрос:'):
+                        question = line.replace('Вопрос:', '').strip()
+                        current_section = "question"
+                    elif line.startswith(('1.', '2.', '3.', '4.')):
+                        option = line[3:].strip()
+                        options.append(option)
+                    elif line.startswith('Правильный ответ:'):
+                        correct_answer = line.replace('Правильный ответ:', '').strip()
+                    elif line.startswith('Подсказка:'):
+                        hint = line.replace('Подсказка:', '').strip()
+
+                if question and len(options) == 4 and correct_answer:
+                    return {
+                        'question': question,
+                        'options': options,
+                        'correct_answer': correct_answer,
+                        'hint': hint if hint else "Подсказка недоступна"
+                    }
+
+        except Exception as e:
+            print(f"Ошибка генерации вопроса викторины по отрасли {industry}: {e}")
+
+        return None
+
     def check_quiz_answer(self, question: str, user_answer: str, correct_answer: str) -> str:
         """Проверяет ответ на вопрос викторины."""
         try:
