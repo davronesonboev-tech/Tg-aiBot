@@ -15,20 +15,10 @@ class KeyboardManager:
         """Главная клавиатура с основными функциями."""
         builder = InlineKeyboardBuilder()
 
-        # Режимы общения
+        # Основные категории
         builder.button(text="🎭 Режимы общения", callback_data="menu_personas")
         builder.button(text="🎮 Игры", callback_data="menu_games")
         builder.button(text="🛠️ Инструменты", callback_data="menu_tools")
-
-        # Развлечения
-        builder.button(text="🎲 Кости", callback_data="game_dice")
-        builder.button(text="🧠 Викторина", callback_data="game_quiz")
-        builder.button(text="🎱 Волшебный шар", callback_data="game_ball")
-
-        # Инструменты быстрого доступа
-        builder.button(text="🧮 Калькулятор", callback_data="tool_calc")
-        builder.button(text="🌤️ Погода", callback_data="tool_weather")
-        builder.button(text="🌐 Перевод", callback_data="tool_translate")
 
         # Служебные функции
         builder.button(text="📊 Статистика", callback_data="stats")
@@ -41,9 +31,9 @@ class KeyboardManager:
 
         # Устанавливаем сетку 2x2 для основных кнопок, затем 3x3 для остальных
         if is_admin:
-            builder.adjust(2, 3, 3, 1)
+            builder.adjust(2, 3, 1)
         else:
-            builder.adjust(2, 3, 3, 1)
+            builder.adjust(2, 3, 1)
 
         return builder.as_markup()
 
@@ -92,6 +82,20 @@ class KeyboardManager:
 
         builder.adjust(1)
 
+        return builder.as_markup()
+
+    @staticmethod
+    def get_rps_choice_menu() -> InlineKeyboardMarkup:
+        """Клавиатура выбора для игры камень-ножницы-бумага."""
+        builder = InlineKeyboardBuilder()
+
+        builder.button(text="🪨 Камень", callback_data="rps_rock")
+        builder.button(text="✂️ Ножницы", callback_data="rps_scissors")
+        builder.button(text="📄 Бумага", callback_data="rps_paper")
+
+        builder.button(text="⬅️ Назад в игры", callback_data="menu_games")
+
+        builder.adjust(3, 1)
         return builder.as_markup()
 
     @staticmethod
