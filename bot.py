@@ -568,18 +568,31 @@ class AIBot:
                 await self._safe_edit_message(callback, result_text, keyboard_manager.get_games_menu())
 
             elif callback_data == "game_quiz":
-                # Викторина использует фиксированные вопросы с правильными ответами
-                # Правильный ответ всегда первый вариант (индекс 0 в списке)
-                correct_answer = "1"  # Для простоты - первый вариант всегда правильный
+                # Генерируем вопрос викторины через Gemini AI
+                quiz_data = game_service.generate_quiz_question()
 
-                # Устанавливаем активную викторину
-                memory_manager.set_user_active_game(user_id, "quiz", {
-                    'correct_answer': correct_answer
-                })
+                if quiz_data:
+                    # Устанавливаем активную викторину с правильным ответом
+                    memory_manager.set_user_active_game(user_id, "quiz", {
+                        'correct_answer': quiz_data['correct_answer'],
+                        'hint': quiz_data['hint']
+                    })
 
-                question = game_service.get_random_question()
-                quiz_text = f"🧠 <b>Викторина:</b>\n\n{question}\n\n🎯 <b>Просто напиши номер ответа!</b> (1-4)"
-                await self._safe_edit_message(callback, quiz_text, keyboard_manager.get_games_menu())
+                    # Форматируем варианты ответов
+                    options_text = "\n".join([f"{i+1}. {opt}" for i, opt in enumerate(quiz_data['options'])])
+
+                    quiz_text = f"🧠 <b>Викторина:</b>\n\n❓ {quiz_data['question']}\n\n{options_text}\n\n🎯 <b>Напиши номер ответа!</b> (1-4)"
+                    await self._safe_edit_message(callback, quiz_text, keyboard_manager.get_games_menu())
+                else:
+                    # Fallback на старый метод при ошибке AI
+                    correct_answer = "1"
+                    memory_manager.set_user_active_game(user_id, "quiz", {
+                        'correct_answer': correct_answer
+                    })
+
+                    question = game_service.get_random_question()
+                    quiz_text = f"🧠 <b>Викторина:</b>\n\n{question}\n\n🎯 <b>Просто напиши номер ответа!</b> (1-4)"
+                    await self._safe_edit_message(callback, quiz_text, keyboard_manager.get_games_menu())
 
             elif callback_data == "game_ball":
                 # Устанавливаем активную игру волшебный шар
@@ -1164,6 +1177,12 @@ class AIBot:
                             # Игра окончена
                             memory_manager.clear_user_active_game(user_id)
                             await message.reply(f"🎉 {result}\n\nХочешь сыграть еще раз? Нажми на кнопку '🔢 Угадай число' в меню!", reply_markup=keyboard_manager.get_menu_button())
+
+                            # Логируем статистику в БД
+                            try:
+                                self.db.update_user_stats(user_id, "total_games")
+                            except Exception as e:
+                                log_error(f"Ошибка логирования угадай числа пользователя {user_id}: {str(e)}")
                         else:
                             await message.reply(f"🎯 {result}", reply_markup=keyboard_manager.get_menu_button())
                         return True
@@ -1182,6 +1201,12 @@ class AIBot:
                             # Викторина окончена
                             memory_manager.clear_user_active_game(user_id)
                             await message.reply(f"🧠 {result}\n\nХочешь ответить на еще один вопрос? Нажми на кнопку '🧠 Викторина' в меню!", reply_markup=keyboard_manager.get_menu_button())
+
+                            # Логируем статистику в БД
+                            try:
+                                self.db.update_user_stats(user_id, "total_quiz_games")
+                            except Exception as e:
+                                log_error(f"Ошибка логирования викторины пользователя {user_id}: {str(e)}")
                         else:
                             await message.reply(f"📚 {result}", reply_markup=keyboard_manager.get_menu_button())
                         return True
@@ -1198,9 +1223,16 @@ class AIBot:
             elif active_game == "magic_ball":
                 # Любой текст считается вопросом к волшебному шару
                 if len(text.strip()) > 0:
-                    answer = game_service.get_magic_ball_answer()
+                    answer = game_service.get_magic_ball_answer(text.strip())
                     memory_manager.clear_user_active_game(user_id)
                     await message.reply(f"❓ <b>Твой вопрос:</b> {text}\n\n{answer}\n\nХочешь спросить еще? Нажми '🎱 Волшебный шар'!", reply_markup=keyboard_manager.get_menu_button())
+
+                    # Логируем статистику в БД
+                    try:
+                        self.db.log_message(user_id, "magic_ball", content=text.strip(), response=answer)
+                        # Волшебный шар можно считать как мини-игру, но не добавляем в total_games
+                    except Exception as e:
+                        log_error(f"Ошибка логирования волшебного шара пользователя {user_id}: {str(e)}")
                     return True
 
             elif active_game.startswith("translate_"):
