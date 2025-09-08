@@ -682,24 +682,58 @@ class AIBot:
 
             elif callback_data == "quiz_hint":
                 # Показываем подсказку для викторины
-                game_data = memory_manager.get_user_game_data(user_id)
+                quiz_session = memory_manager.get_user_game_data(user_id)
 
-                if game_data and 'hint' in game_data and 'question' in game_data:
-                    question = game_data['question']
-                    hint = game_data['hint']
-                    options = game_data.get('options', [])
+                if not quiz_session or quiz_session.get('current_question') is None:
+                    await callback.answer("❌ Викторина не активна")
+                    return
 
-                    # Создаем новый текст с подсказкой
-                    hint_text = f"🧠 <b>Викторина:</b>\n\n❓ {question}\n\n💡 <b>Подсказка:</b> {hint}\n\n🎯 <b>Выбери правильный ответ:</b>"
+                current_q = quiz_session['current_question']
+                questions = quiz_session.get('questions', [])
+                total_questions = quiz_session.get('total_questions', 0)
 
-                    # Проверяем, отличается ли новый текст от текущего
-                    current_text = callback.message.text or ""
-                    if current_text != hint_text and options:
-                        await self._safe_edit_message(callback, hint_text, keyboard_manager.get_quiz_answers_menu(options))
-                    else:
-                        await callback.answer("💡 Подсказка уже показана!")
-                else:
-                    await callback.answer("❌ Подсказка недоступна")
+                # Система подсказок: рассчитываем доступные подсказки
+                # 5 вопросов = 0 подсказок, 10 вопросов = 1 подсказка, 15 = 2, 20 = 3, 25 = 4, 30 = 5
+                max_hints = max(0, (total_questions - 5) // 5)
+                used_hints = quiz_session.get('used_hints', 0)
+
+                if max_hints <= 0:
+                    await callback.answer(f"❌ В викторине на {total_questions} вопросов подсказки недоступны!")
+                    return
+
+                if used_hints >= max_hints:
+                    await callback.answer(f"❌ Все подсказки использованы! ({used_hints}/{max_hints})")
+                    return
+
+                if current_q >= len(questions):
+                    await callback.answer("❌ Вопрос недоступен")
+                    return
+
+                # Получаем текущий вопрос
+                question_data = questions[current_q]
+                question = question_data.get('question', '')
+                hint = question_data.get('hint', 'Подсказка недоступна')
+                options = question_data.get('options', [])
+
+                if not question or not hint:
+                    await callback.answer("❌ Подсказка недоступна для этого вопроса")
+                    return
+
+                # Увеличиваем счетчик использованных подсказок
+                quiz_session['used_hints'] = used_hints + 1
+                memory_manager.update_user_game_data(user_id, "quiz_active", quiz_session)
+
+                # Создаем текст с подсказкой
+                remaining_hints = max_hints - (used_hints + 1)
+                progress_text = f"📊 <b>Вопрос {current_q + 1}/{total_questions}</b>\n💡 <b>Подсказки:</b> {remaining_hints} осталось\n\n"
+                hint_text = f"❓ {question}\n\n💡 <b>Подсказка:</b> {hint}\n\n🎯 <b>Выбери правильный ответ:</b>"
+
+                combined_text = progress_text + hint_text
+
+                # Обновляем сообщение с подсказкой
+                await self._safe_edit_message(callback, combined_text, keyboard_manager.get_quiz_answers_menu(options, total_questions, used_hints + 1))
+
+                await callback.answer(f"💡 Подсказка использована! Осталось: {remaining_hints}")
 
             elif callback_data == "quiz_settings":
                 # Возврат к настройкам викторины
@@ -823,6 +857,7 @@ class AIBot:
                         'correct_answers': 0,
                         'total_questions': question_count,
                         'questions': [],
+                        'used_hints': 0,  # Счетчик использованных подсказок
                         'start_time': datetime.now(),
                         'question_start_time': datetime.now()
                     }
@@ -1938,7 +1973,11 @@ class AIBot:
         quiz_session['question_start_time'] = datetime.now()
         memory_manager.update_user_game_data(user_id, "quiz_active", quiz_session)
 
-        await self._safe_edit_message(callback, progress_text, keyboard_manager.get_quiz_answers_menu(question_data['options']))
+        # Получаем информацию о подсказках для кнопки
+        used_hints = quiz_session.get('used_hints', 0)
+        total_questions = quiz_session.get('total_questions', 10)
+
+        await self._safe_edit_message(callback, progress_text, keyboard_manager.get_quiz_answers_menu(question_data['options'], total_questions, used_hints))
 
     async def _finish_quiz(self, callback, quiz_session):
         """Завершает викторину и показывает результаты."""
