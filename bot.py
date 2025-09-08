@@ -1239,7 +1239,7 @@ class AIBot:
                                 log_error(f"Ошибка логирования угадай числа пользователя {user_id}: {str(e)}")
                         else:
                             await message.reply(f"🎯 {result}", reply_markup=keyboard_manager.get_menu_button())
-                        return True
+                            return True  # Важно вернуть True, чтобы игра продолжилась
 
             elif active_game == "quiz":
                 # Проверяем, является ли текст числом от 1 до 4
