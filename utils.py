@@ -676,33 +676,321 @@ class GameService:
         else:
             return "🎉 Правильно! Ты угадал! 🎊"
 
-    def play_dice_game(self, bet: str = 'medium') -> str:
-        """Игра в кости."""
+    def play_dice_game(self, bet: str = 'medium', user_id: int = None) -> Tuple[str, Dict[str, Any]]:
+        """
+        Улучшенная игра в кости с умной логикой бота.
+
+        Args:
+            bet: Уровень ставки (low/medium/high или низкий/средний/высокий)
+            user_id: ID пользователя для истории и статистики
+
+        Returns:
+            Tuple[str, Dict[str, Any]]: Результат игры и данные для истории
+        """
         try:
+            # Расширенные ставки с бонусами
             bets = {
-                'low': (1, 3),
-                'medium': (4, 10),
-                'high': (11, 18)
+                'low': {'range': (1, 6), 'name': 'Низкая', 'emoji': '🎯', 'bonus': 1.2},
+                'medium': {'range': (7, 12), 'name': 'Средняя', 'emoji': '🎲', 'bonus': 1.0},
+                'high': {'range': (13, 18), 'name': 'Высокая', 'emoji': '💎', 'bonus': 0.8},
+                'ultra': {'range': (19, 24), 'name': 'Ультра', 'emoji': '⚡', 'bonus': 0.6},
+                'legendary': {'range': (25, 30), 'name': 'Легендарная', 'emoji': '👑', 'bonus': 0.4}
             }
 
-            min_bet, max_bet = bets.get(bet, (4, 10))
-            user_dice = random.randint(min_bet, max_bet)
-            bot_dice = random.randint(min_bet, max_bet)
+            # Преобразование русских названий
+            bet_map = {
+                'низкий': 'low', 'низкая': 'low',
+                'средний': 'medium', 'средняя': 'medium',
+                'высокий': 'high', 'высокая': 'high',
+                'ультра': 'ultra', 'легендарная': 'legendary', 'легендарный': 'legendary'
+            }
+            bet = bet_map.get(bet, bet)
 
-            result = ""
-            if user_dice > bot_dice:
-                result = "🎉 Ты победил! 🎲"
-            elif user_dice < bot_dice:
-                result = "😢 Я победил! 🎲"
-            else:
-                result = "🤝 Ничья! 🎲"
+            if bet not in bets:
+                return f"❌ Неизвестная ставка! Доступные: {', '.join(bets.keys())}", {}
 
-            return f"🎯 <b>Игра в кости</b>\n\n" \
-                   f"Твои кости: {user_dice}\n" \
-                   f"Мои кости: {bot_dice}\n\n" \
-                   f"{result}"
+            bet_info = bets[bet]
+            min_bet, max_bet = bet_info['range']
+
+            # Умный выбор кубиков для бота
+            user_dice = self._get_smart_dice_roll(min_bet, max_bet, user_id, 'user')
+            bot_dice = self._get_smart_dice_roll(min_bet, max_bet, user_id, 'bot')
+
+            # Определяем победителя
+            result, winner = self._determine_dice_winner(user_dice, bot_dice)
+
+            # Создаем красивый результат
+            result_text = self._format_dice_result(user_dice, bot_dice, result, winner, bet_info)
+
+            # Данные для истории
+            game_data = {
+                'user_dice': user_dice,
+                'bot_dice': bot_dice,
+                'bet_level': bet,
+                'bet_name': bet_info['name'],
+                'result': result,
+                'winner': winner,
+                'timestamp': datetime.now().isoformat(),
+                'bonus_multiplier': bet_info['bonus']
+            }
+
+            return result_text, game_data
+
         except Exception as e:
-            return f"❌ Ошибка в игре: {str(e)}"
+            return f"❌ Ошибка в игре: {str(e)}", {}
+
+    def _get_smart_dice_roll(self, min_bet: int, max_bet: int, user_id: int = None, player_type: str = 'user') -> int:
+        """
+        Умный бросок кубика с учетом стратегии.
+
+        Args:
+            min_bet: Минимальное значение
+            max_bet: Максимальное значение
+            user_id: ID пользователя
+            player_type: Тип игрока ('user' или 'bot')
+
+        Returns:
+            int: Результат броска
+        """
+        import secrets
+
+        if player_type == 'bot':
+            # Для бота - умная стратегия
+            # 70% шанс выбрать среднее значение диапазона
+            # 20% шанс выбрать высокое значение
+            # 10% шанс выбрать низкое значение
+            range_size = max_bet - min_bet + 1
+
+            rand_choice = secrets.randbelow(100)
+            if rand_choice < 70:
+                # Средний диапазон (умный выбор)
+                mid_start = min_bet + (range_size // 3)
+                mid_end = max_bet - (range_size // 3)
+                if mid_start <= mid_end:
+                    return secrets.randbelow(mid_end - mid_start + 1) + mid_start
+                else:
+                    return secrets.randbelow(range_size) + min_bet
+            elif rand_choice < 90:
+                # Высокий диапазон
+                high_start = max_bet - (range_size // 3)
+                return secrets.randbelow(max_bet - high_start + 1) + high_start
+            else:
+                # Низкий диапазон
+                low_end = min_bet + (range_size // 3)
+                return secrets.randbelow(low_end - min_bet + 1) + min_bet
+        else:
+            # Для пользователя - обычный рандом
+            return secrets.randbelow(max_bet - min_bet + 1) + min_bet
+
+    def _determine_dice_winner(self, user_dice: int, bot_dice: int) -> Tuple[str, str]:
+        """
+        Определяет победителя игры в кости.
+
+        Returns:
+            Tuple[str, str]: (результат, победитель)
+        """
+        if user_dice > bot_dice:
+            return "🎉 Ты победил! 🎲", "user"
+        elif user_dice < bot_dice:
+            return "😢 Я победил! 🎲", "bot"
+        else:
+            return "🤝 Ничья! 🎲", "draw"
+
+    def _format_dice_result(self, user_dice: int, bot_dice: int, result: str, winner: str, bet_info: Dict) -> str:
+        """
+        Форматирует красивый результат игры в кости.
+
+        Returns:
+            str: Отформатированный результат
+        """
+        # Эмодзи для кубиков
+        dice_emojis = {
+            1: '⚀', 2: '⚁', 3: '⚂', 4: '⚃', 5: '⚄', 6: '⚅'
+        }
+
+        # Получаем эмодзи для цифр (если в диапазоне 1-6)
+        user_emoji = dice_emojis.get(user_dice, '🎲')
+        bot_emoji = dice_emojis.get(bot_dice, '🎲')
+
+        # Дополнительные сообщения в зависимости от результата
+        extra_messages = {
+            "user": [
+                "🎯 Отличный бросок!",
+                "🏆 Ты мастер кубиков!",
+                "💪 Сила в руках!",
+                "🔥 Жгучий бросок!",
+                "⚡ Молниеносная победа!"
+            ],
+            "bot": [
+                "🤖 Я рассчитал это!",
+                "🎭 Следующий раз повезет!",
+                "🧠 Я анализирую броски!",
+                "💡 Попробуй другую ставку!",
+                "🎪 ИИ всегда на шаг впереди!"
+            ],
+            "draw": [
+                "🤝 Равные соперники!",
+                "⚖️ Баланс сил!",
+                "🔄 Кубики согласны!",
+                "🎭 Игра продолжается!",
+                "⚡ Энергия накапливается!"
+            ]
+        }
+
+        import secrets
+        extra_msg = secrets.choice(extra_messages.get(winner, ["🎮 Продолжаем игру!"]))
+
+        # Создаем визуальное представление кубиков
+        dice_visual = self._create_dice_visual(user_dice, bot_dice)
+
+        return f"{bet_info['emoji']} <b>Игра в кости - {bet_info['name']} ставка</b>\n\n" \
+               f"{dice_visual}\n" \
+               f"🎯 <b>Твой бросок:</b> {user_dice}\n" \
+               f"🤖 <b>Мой бросок:</b> {bot_dice}\n\n" \
+               f"<b>{result}</b>\n" \
+               f"<i>{extra_msg}</i>"
+
+    def _create_dice_visual(self, user_dice: int, bot_dice: int) -> str:
+        """
+        Создает визуальное представление кубиков.
+
+        Returns:
+            str: Визуальное представление
+        """
+        # Простое визуальное представление с эмодзи
+        dice_emojis = ['⚀', '⚁', '⚂', '⚃', '⚄', '⚅']
+
+        user_visual = dice_emojis[user_dice - 1] if 1 <= user_dice <= 6 else '🎲'
+        bot_visual = dice_emojis[bot_dice - 1] if 1 <= bot_dice <= 6 else '🎲'
+
+        return f"🎲 {user_visual}   🤖 {bot_visual}"
+
+    def get_dice_history(self, user_id: int, limit: int = 10) -> List[Dict[str, Any]]:
+        """
+        Получает историю игр в кости пользователя.
+
+        Args:
+            user_id: ID пользователя
+            limit: Максимальное количество записей
+
+        Returns:
+            List[Dict[str, Any]]: Список последних игр
+        """
+        try:
+            from database import DatabaseManager
+            db = DatabaseManager()
+            session = db.Session()
+
+            # Получаем последние игры в кости пользователя
+            from database import MessageLog
+            games = session.query(MessageLog).filter(
+                MessageLog.user_id == user_id,
+                MessageLog.message_type == "game_dice"
+            ).order_by(MessageLog.created_at.desc()).limit(limit).all()
+
+            history = []
+            for game in games:
+                try:
+                    # Парсим данные из ответа
+                    response_lines = game.response.split('\n')
+                    user_dice = ""
+                    bot_dice = ""
+                    bet_level = ""
+                    result = ""
+
+                    for line in response_lines:
+                        if "Твой бросок:" in line:
+                            user_dice = line.split(":")[-1].strip()
+                        elif "Мой бросок:" in line:
+                            bot_dice = line.split(":")[-1].strip()
+                        elif "ставка" in line and bet_level == "":
+                            # Извлекаем уровень ставки
+                            if "Низкая" in line:
+                                bet_level = "low"
+                            elif "Средняя" in line:
+                                bet_level = "medium"
+                            elif "Высокая" in line:
+                                bet_level = "high"
+                            elif "Ультра" in line:
+                                bet_level = "ultra"
+                            elif "Легендарная" in line:
+                                bet_level = "legendary"
+                        elif any(x in line for x in ["🎉 Ты победил", "😢 Я победил", "🤝 Ничья"]):
+                            if "🎉 Ты победил" in line:
+                                result = "user_win"
+                            elif "😢 Я победил" in line:
+                                result = "bot_win"
+                            else:
+                                result = "draw"
+
+                    try:
+                        user_dice_int = int(user_dice) if user_dice.isdigit() else 0
+                        bot_dice_int = int(bot_dice) if bot_dice.isdigit() else 0
+
+                        if user_dice_int > 0 and bot_dice_int > 0:
+                            history.append({
+                                'user_dice': user_dice_int,
+                                'bot_dice': bot_dice_int,
+                                'bet_level': bet_level,
+                                'result': result,
+                                'timestamp': game.created_at.isoformat() if game.created_at else None
+                            })
+                    except ValueError:
+                        continue
+
+                except Exception as e:
+                    continue
+
+            session.close()
+            return history
+
+        except Exception as e:
+            return []
+
+    def get_dice_stats(self, user_id: int) -> Dict[str, Any]:
+        """
+        Получает статистику игр в кости пользователя.
+
+        Args:
+            user_id: ID пользователя
+
+        Returns:
+            Dict[str, Any]: Статистика игр
+        """
+        history = self.get_dice_history(user_id, limit=1000)  # Получаем много игр для статистики
+
+        total_games = len(history)
+        user_wins = sum(1 for game in history if game['result'] == 'user_win')
+        bot_wins = sum(1 for game in history if game['result'] == 'bot_win')
+        draws = sum(1 for game in history if game['result'] == 'draw')
+
+        # Статистика по ставкам
+        bet_stats = {}
+        for game in history:
+            bet_level = game.get('bet_level', 'unknown')
+            if bet_level not in bet_stats:
+                bet_stats[bet_level] = {'games': 0, 'wins': 0}
+            bet_stats[bet_level]['games'] += 1
+            if game['result'] == 'user_win':
+                bet_stats[bet_level]['wins'] += 1
+
+        # Средние значения кубиков
+        user_avg = sum(game['user_dice'] for game in history) / total_games if total_games > 0 else 0
+        bot_avg = sum(game['bot_dice'] for game in history) / total_games if total_games > 0 else 0
+
+        # Процент побед
+        win_rate = (user_wins / total_games * 100) if total_games > 0 else 0
+
+        return {
+            'total_games': total_games,
+            'user_wins': user_wins,
+            'bot_wins': bot_wins,
+            'draws': draws,
+            'win_rate': round(win_rate, 1),
+            'user_avg_dice': round(user_avg, 1),
+            'bot_avg_dice': round(bot_avg, 1),
+            'bet_stats': bet_stats
+        }
 
     def get_random_question(self) -> str:
         """Возвращает случайный вопрос для викторины."""
