@@ -236,14 +236,40 @@ class KeyboardManager:
         """Меню выбора ставки для игры в кости."""
         builder = InlineKeyboardBuilder()
 
-        builder.button(text="🎯 Низкая ставка", callback_data="dice_low")
-        builder.button(text="🎲 Средняя ставка", callback_data="dice_medium")
-        builder.button(text="💎 Высокая ставка", callback_data="dice_high")
+        builder.button(text="🎯 Низкая (1-6)", callback_data="dice_low")
+        builder.button(text="🎲 Средняя (7-12)", callback_data="dice_medium")
+        builder.button(text="💎 Высокая (13-18)", callback_data="dice_high")
+        builder.button(text="⚡ Ультра (19-24)", callback_data="dice_ultra")
+        builder.button(text="👑 Легендарная (25-30)", callback_data="dice_legendary")
 
-        builder.button(text="⬅️ Назад", callback_data="menu_games")
+        builder.button(text="⬅️ Назад в игры", callback_data="menu_games")
 
-        builder.adjust(1)
+        builder.adjust(1, 1, 1, 1, 1, 2)
 
+        return builder.as_markup()
+
+    @staticmethod
+    def get_dice_stats_menu() -> InlineKeyboardMarkup:
+        """Меню статистики для игры в кости."""
+        builder = InlineKeyboardBuilder()
+
+        builder.button(text="📚 История костей", callback_data="dice_history")
+        builder.button(text="🎲 Сыграть", callback_data="game_dice")
+        builder.button(text="⬅️ Назад в игры", callback_data="menu_games")
+
+        builder.adjust(2, 1)
+        return builder.as_markup()
+
+    @staticmethod
+    def get_dice_history_menu() -> InlineKeyboardMarkup:
+        """Меню истории для игры в кости."""
+        builder = InlineKeyboardBuilder()
+
+        builder.button(text="📊 Статистика костей", callback_data="dice_stats")
+        builder.button(text="🎲 Сыграть", callback_data="game_dice")
+        builder.button(text="⬅️ Назад в игры", callback_data="menu_games")
+
+        builder.adjust(2, 1)
         return builder.as_markup()
 
     @staticmethod
