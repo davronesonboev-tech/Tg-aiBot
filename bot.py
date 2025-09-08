@@ -568,30 +568,29 @@ class AIBot:
                 await self._safe_edit_message(callback, result_text, keyboard_manager.get_games_menu())
 
             elif callback_data == "game_quiz":
-                # Генерируем вопрос викторины через Gemini AI
-                quiz_data = game_service.generate_quiz_question()
+                # Показываем меню настроек викторины
+                settings_text = "🧠 <b>Настройки викторины</b>\n\n" \
+                               "🎯 Выберите параметры для игры:\n\n" \
+                               "• Отрасль знаний\n" \
+                               "• Количество вопросов\n" \
+                               "• Режим игры\n\n" \
+                               "📚 <b>Рекомендации:</b>\n" \
+                               "• Для новичков: 5-10 вопросов\n" \
+                               "• Для опытных: 15-20 вопросов\n" \
+                               "• Для экспертов: 25-30 вопросов"
 
-                if quiz_data:
-                    # Устанавливаем активную викторину с правильным ответом
-                    memory_manager.set_user_active_game(user_id, "quiz", {
-                        'correct_answer': quiz_data['correct_answer'],
-                        'hint': quiz_data['hint'],
-                        'options': quiz_data['options'],
-                        'question': quiz_data['question']
-                    })
+                # Инициализируем настройки викторины по умолчанию
+                memory_manager.set_user_active_game(user_id, "quiz_setup", {
+                    'industry': 'случайная',
+                    'question_count': 10,
+                    'current_question': 0,
+                    'correct_answers': 0,
+                    'total_questions': 0,
+                    'questions': [],
+                    'start_time': None
+                })
 
-                    quiz_text = f"🧠 <b>Викторина:</b>\n\n❓ {quiz_data['question']}\n\n🎯 <b>Выбери правильный ответ:</b>"
-                    await self._safe_edit_message(callback, quiz_text, keyboard_manager.get_quiz_answers_menu(quiz_data['options']))
-                else:
-                    # Fallback на старый метод при ошибке AI
-                    correct_answer = "1"
-                    memory_manager.set_user_active_game(user_id, "quiz", {
-                        'correct_answer': correct_answer
-                    })
-
-                    question = game_service.get_random_question()
-                    quiz_text = f"🧠 <b>Викторина:</b>\n\n{question}\n\n🎯 <b>Просто напиши номер ответа!</b> (1-4)"
-                    await self._safe_edit_message(callback, quiz_text, keyboard_manager.get_games_menu())
+                await self._safe_edit_message(callback, settings_text, keyboard_manager.get_quiz_settings_menu())
 
             elif callback_data == "game_ball":
                 # Устанавливаем активную игру волшебный шар
@@ -603,36 +602,42 @@ class AIBot:
             elif callback_data.startswith("quiz_answer_"):
                 # Обработка ответа на викторину
                 user_answer = callback_data.split("_", 2)[2]  # Получаем номер ответа (1, 2, 3, 4)
-                game_data = memory_manager.get_user_game_data(user_id)
+                quiz_session = memory_manager.get_user_game_data(user_id)
 
-                if game_data and 'correct_answer' in game_data:
-                    correct_answer = game_data['correct_answer']
-                    question = game_data.get('question', '')
-                    options = game_data.get('options', [])
+                if quiz_session and quiz_session.get('current_question') is not None:
+                    current_q = quiz_session['current_question']
+                    questions = quiz_session.get('questions', [])
 
-                    result = game_service.check_quiz_answer(question, user_answer, correct_answer)
+                    if current_q < len(questions):
+                        question_data = questions[current_q]
+                        correct_answer = question_data['correct_answer']
 
-                    if "Правильно" in result:
-                        # Викторина окончена
-                        memory_manager.clear_user_active_game(user_id)
-                        await callback.message.reply(f"🧠 {result}\n\nХочешь ответить на еще один вопрос? Нажми на кнопку '🧠 Викторина' в меню!", reply_markup=keyboard_manager.get_menu_button())
+                        # Проверяем ответ
+                        is_correct = str(user_answer) == str(correct_answer)
 
-                        # Логируем статистику в БД
-                        try:
-                            self.db.update_user_stats(user_id, "total_quiz_games")
-                        except Exception as e:
-                            log_error(f"Ошибка логирования викторины пользователя {user_id}: {str(e)}")
-                    else:
-                        # Показываем подсказку и даем возможность выбрать другой ответ
-                        hint = game_data.get('hint', 'Подсказка недоступна')
-                        wrong_text = f"❌ <b>Неправильно!</b>\n\n💡 <b>Подсказка:</b> {hint}\n\n🎯 <b>Попробуй выбрать другой ответ:</b>"
-
-                        if options:
-                            await self._safe_edit_message(callback, wrong_text, keyboard_manager.get_quiz_answers_menu(options))
+                        if is_correct:
+                            quiz_session['correct_answers'] += 1
+                            result_text = "✅ <b>Правильно!</b> 🎉"
                         else:
-                            await callback.answer("❌ Ошибка загрузки вариантов ответов")
+                            result_text = f"❌ <b>Неправильно!</b>\n\n💡 <b>Правильный ответ:</b> {question_data['options'][int(correct_answer)-1]}"
+
+                        # Обновляем сессию
+                        quiz_session['current_question'] += 1
+                        memory_manager.update_user_game_data(user_id, quiz_session)
+
+                        # Показываем результат и переходим к следующему вопросу или завершаем
+                        if quiz_session['current_question'] >= quiz_session['total_questions']:
+                            # Викторина завершена
+                            await self._finish_quiz(callback, quiz_session)
+                        else:
+                            # Показываем следующий вопрос через небольшую задержку
+                            await callback.message.reply(result_text)
+                            await asyncio.sleep(1.5)  # Небольшая пауза для чтения результата
+                            await self._show_next_quiz_question(callback)
+                    else:
+                        await callback.answer("❌ Ошибка: вопрос не найден")
                 else:
-                    await callback.answer("❌ Игра не найдена")
+                    await callback.answer("❌ Викторина не активна")
 
             elif callback_data == "quiz_hint":
                 # Показываем подсказку для викторины
@@ -654,6 +659,147 @@ class AIBot:
                         await callback.answer("💡 Подсказка уже показана!")
                 else:
                     await callback.answer("❌ Подсказка недоступна")
+
+            elif callback_data == "quiz_settings":
+                # Возврат к настройкам викторины
+                settings_text = "🧠 <b>Настройки викторины</b>\n\n" \
+                               "🎯 Выберите параметры для игры:\n\n" \
+                               "• Отрасль знаний\n" \
+                               "• Количество вопросов\n" \
+                               "• Режим игры\n\n" \
+                               "📚 <b>Рекомендации:</b>\n" \
+                               "• Для новичков: 5-10 вопросов\n" \
+                               "• Для опытных: 15-20 вопросов\n" \
+                               "• Для экспертов: 25-30 вопросов"
+
+                await self._safe_edit_message(callback, settings_text, keyboard_manager.get_quiz_settings_menu())
+
+            elif callback_data == "quiz_select_industry":
+                # Выбор отрасли
+                industry_text = "🎯 <b>Выберите отрасль знаний</b>\n\n" \
+                               "📚 <b>Доступные отрасли:</b>\n" \
+                               "• Наука и техника\n" \
+                               "• Искусство и культура\n" \
+                               "• История и география\n" \
+                               "• Спорт и развлечения\n\n" \
+                               "🎲 <b>Случайная отрасль</b> - выберет случайную тему"
+
+                await self._safe_edit_message(callback, industry_text, keyboard_manager.get_quiz_industry_menu())
+
+            elif callback_data == "quiz_select_count":
+                # Выбор количества вопросов
+                count_text = "🔢 <b>Выберите количество вопросов</b>\n\n" \
+                            "📊 <b>Рекомендации:</b>\n" \
+                            "• 🔸 <b>5 вопросов</b> - быстрый тест (2-3 мин)\n" \
+                            "• 🔹 <b>10 вопросов</b> - стандартная игра (5-7 мин)\n" \
+                            "• 🔸 <b>15 вопросов</b> - расширенная игра (8-10 мин)\n" \
+                            "• 🔹 <b>20 вопросов</b> - для любителей (12-15 мин)\n" \
+                            "• 🔸 <b>25 вопросов</b> - экспертный уровень (15-18 мин)\n" \
+                            "• 🔹 <b>30 вопросов</b> - максимальный челлендж (18-20 мин)\n\n" \
+                            "✏️ <b>Свое количество</b> - введите любое число от 1 до 50"
+
+                await self._safe_edit_message(callback, count_text, keyboard_manager.get_quiz_count_menu())
+
+            elif callback_data.startswith("quiz_industry_"):
+                # Выбор отрасли
+                industry = callback_data.replace("quiz_industry_", "")
+                game_data = memory_manager.get_user_game_data(user_id)
+
+                if game_data:
+                    game_data['industry'] = industry
+                    memory_manager.update_user_game_data(user_id, game_data)
+
+                    industry_names = {
+                        'биология': '🧬 Биология',
+                        'химия': '⚗️ Химия',
+                        'математика': '🧮 Математика',
+                        'физика': '⚡ Физика',
+                        'география': '🗺️ География',
+                        'история': '📜 История',
+                        'искусство': '🎨 Искусство',
+                        'спорт': '⚽ Спорт',
+                        'кино': '🎬 Кино',
+                        'литература': '📚 Литература',
+                        'музыка': '🎵 Музыка',
+                        'психология': '🧠 Психология',
+                        'экономика': '💰 Экономика',
+                        'программирование': '💻 Программирование',
+                        'искусственный интеллект': '🤖 ИИ',
+                        'кибербезопасность': '🔒 Кибербезопасность',
+                        'медицина': '🩺 Медицина',
+                        'астрономия': '🌌 Астрономия',
+                        'случайная': '🎲 Случайная отрасль'
+                    }
+
+                    selected_name = industry_names.get(industry, industry.capitalize())
+
+                    settings_text = f"✅ <b>Отрасль выбрана:</b> {selected_name}\n\n" \
+                                   "🎯 Выберите остальные параметры или начните игру!"
+
+                    await self._safe_edit_message(callback, settings_text, keyboard_manager.get_quiz_settings_menu())
+
+            elif callback_data.startswith("quiz_count_"):
+                # Выбор количества вопросов
+                if callback_data == "quiz_count_custom":
+                    # Запрос пользовательского количества
+                    custom_text = "✏️ <b>Введите количество вопросов</b>\n\n" \
+                                 "📝 <b>Правила:</b>\n" \
+                                 "• Минимум: 1 вопрос\n" \
+                                 "• Максимум: 50 вопросов\n" \
+                                 "• Только цифры\n\n" \
+                                 "🎯 <b>Пример:</b> введите число от 1 до 50"
+
+                    memory_manager.set_user_active_game(user_id, "quiz_custom_count", {})
+                    await self._safe_edit_message(callback, custom_text, keyboard_manager.get_games_menu())
+                    return
+
+                count = int(callback_data.replace("quiz_count_", ""))
+                game_data = memory_manager.get_user_game_data(user_id)
+
+                if game_data:
+                    game_data['question_count'] = count
+                    memory_manager.update_user_game_data(user_id, game_data)
+
+                    settings_text = f"✅ <b>Количество вопросов:</b> {count}\n\n" \
+                                   "🎯 Выберите остальные параметры или начните игру!"
+
+                    await self._safe_edit_message(callback, settings_text, keyboard_manager.get_quiz_settings_menu())
+
+            elif callback_data == "quiz_start":
+                # Начало викторины
+                game_data = memory_manager.get_user_game_data(user_id)
+
+                if game_data:
+                    # Инициализируем викторину
+                    industry = game_data.get('industry', 'случайная')
+                    question_count = game_data.get('question_count', 10)
+
+                    # Создаем сессию викторины
+                    quiz_session = {
+                        'industry': industry,
+                        'question_count': question_count,
+                        'current_question': 0,
+                        'correct_answers': 0,
+                        'total_questions': question_count,
+                        'questions': [],
+                        'start_time': datetime.now(),
+                        'question_start_time': datetime.now()
+                    }
+
+                    memory_manager.set_user_active_game(user_id, "quiz_active", quiz_session)
+
+                    # Показываем первый вопрос
+                    await self._show_next_quiz_question(callback)
+                else:
+                    await callback.answer("❌ Ошибка настройки викторины")
+
+            elif callback_data == "quiz_finish":
+                # Принудительное завершение викторины
+                quiz_session = memory_manager.get_user_game_data(user_id)
+                if quiz_session:
+                    await self._finish_quiz(callback, quiz_session)
+                else:
+                    await callback.answer("❌ Викторина не найдена")
 
             # Обработка инструментов
             elif callback_data == "tool_calc":
@@ -1323,6 +1469,28 @@ class AIBot:
             log_error(f"Ошибка при обработке ответа на игру {active_game}: {str(e)}", user_id)
             await message.reply("❌ Произошла ошибка. Попробуй начать заново!")
 
+            elif active_game == "quiz_custom_count":
+                # Обработка пользовательского количества вопросов
+                if len(text.strip()) > 0:
+                    try:
+                        count = int(text.strip())
+                        if 1 <= count <= 50:
+                            game_data = memory_manager.get_user_game_data(user_id)
+                            if game_data:
+                                game_data['question_count'] = count
+                                memory_manager.update_user_game_data(user_id, game_data)
+
+                            settings_text = f"✅ <b>Количество вопросов:</b> {count}\n\n🎯 Теперь нажми '🎮 Начать викторину'!"
+                            await message.reply(settings_text, reply_markup=keyboard_manager.get_quiz_settings_menu())
+
+                            memory_manager.clear_user_active_game(user_id)
+                            return True
+                        else:
+                            await message.reply("❌ Количество вопросов должно быть от 1 до 50!")
+                    except ValueError:
+                        await message.reply("❌ Введите число от 1 до 50!")
+                return True
+
         return False
 
     async def _check_tool_request(self, user_id: int, text: str, message: types.Message) -> bool:
@@ -1674,6 +1842,115 @@ class AIBot:
         except Exception as e:
             log_error(f"Ошибка при обработке аудио файла: {str(e)}", user_id, e)
             await message.reply("❌ Произошла ошибка при обработке аудио файла.")
+
+    async def _show_next_quiz_question(self, callback):
+        """Показывает следующий вопрос викторины."""
+        user_id = callback.from_user.id
+        quiz_session = memory_manager.get_user_game_data(user_id)
+
+        if not quiz_session or quiz_session.get('current_question') is None:
+            await callback.answer("❌ Викторина не активна")
+            return
+
+        current_q = quiz_session['current_question']
+        total_q = quiz_session['total_questions']
+        industry = quiz_session.get('industry', 'случайная')
+
+        # Генерируем новый вопрос, если его нет в списке
+        if current_q >= len(quiz_session.get('questions', [])):
+            # Генерируем вопрос по выбранной отрасли
+            if industry == 'случайная':
+                # Выбираем случайную отрасль
+                industries = [
+                    "программирование", "искусственный интеллект", "кибербезопасность",
+                    "история", "наука", "география", "искусство", "спорт", "кино",
+                    "литература", "музыка", "философия", "психология", "экономика",
+                    "биология", "физика", "химия", "математика", "медицина"
+                ]
+                selected_industry = random.choice(industries)
+            else:
+                selected_industry = industry
+
+            # Генерируем вопрос
+            quiz_data = game_service.generate_quiz_question_specific(selected_industry)
+
+            if not quiz_data:
+                # Fallback на общий генератор
+                quiz_data = game_service.generate_quiz_question()
+
+            if quiz_data:
+                quiz_session['questions'].append(quiz_data)
+                memory_manager.update_user_game_data(user_id, quiz_session)
+            else:
+                await callback.message.reply("❌ Не удалось сгенерировать вопрос викторины")
+                return
+
+        # Получаем текущий вопрос
+        question_data = quiz_session['questions'][current_q]
+
+        # Показываем вопрос с прогрессом
+        progress_text = f"📊 <b>Вопрос {current_q + 1}/{total_q}</b>\n\n"
+        progress_text += f"❓ {question_data['question']}\n\n"
+        progress_text += "🎯 <b>Выбери правильный ответ:</b>"
+
+        # Обновляем время начала вопроса
+        quiz_session['question_start_time'] = datetime.now()
+        memory_manager.update_user_game_data(user_id, quiz_session)
+
+        await self._safe_edit_message(callback, progress_text, keyboard_manager.get_quiz_answers_menu(question_data['options']))
+
+    async def _finish_quiz(self, callback, quiz_session):
+        """Завершает викторину и показывает результаты."""
+        user_id = callback.from_user.id
+        correct = quiz_session.get('correct_answers', 0)
+        total = quiz_session.get('total_questions', 0)
+        start_time = quiz_session.get('start_time')
+
+        # Вычисляем время прохождения
+        end_time = datetime.now()
+        if start_time:
+            duration = end_time - start_time
+            minutes = duration.seconds // 60
+            seconds = duration.seconds % 60
+            time_text = f"{minutes}:{seconds:02d}"
+        else:
+            time_text = "неизвестно"
+
+        # Вычисляем процент правильных ответов
+        percentage = (correct / total * 100) if total > 0 else 0
+
+        # Определяем оценку
+        if percentage >= 90:
+            grade = "🎓 Отлично! Ты эксперт!"
+            emoji = "🏆"
+        elif percentage >= 75:
+            grade = "👍 Хорошо! Продолжай в том же духе!"
+            emoji = "👏"
+        elif percentage >= 50:
+            grade = "🤔 Неплохо! Можно лучше!"
+            emoji = "💪"
+        else:
+            grade = "📚 Нужно подучить материал!"
+            emoji = "📖"
+
+        result_text = f"🏁 <b>Викторина завершена!</b>\n\n"
+        result_text += f"📊 <b>Результаты:</b>\n"
+        result_text += f"✅ Правильных ответов: <b>{correct}/{total}</b>\n"
+        result_text += f"📈 Процент правильных: <b>{percentage:.1f}%</b>\n"
+        result_text += f"⏱️ Время прохождения: <b>{time_text}</b>\n\n"
+        result_text += f"{emoji} <b>{grade}</b>\n\n"
+        result_text += "🎮 Хочешь сыграть еще раз?"
+
+        # Очищаем викторину
+        memory_manager.clear_user_active_game(user_id)
+
+        # Логируем статистику
+        try:
+            self.db.update_user_stats(user_id, "total_quiz_games")
+        except Exception as e:
+            log_error(f"Ошибка логирования викторины пользователя {user_id}: {str(e)}")
+
+        await callback.message.reply(result_text, reply_markup=keyboard_manager.get_menu_button())
 
     async def start_polling(self):
         """Запускает бота в режиме polling."""
