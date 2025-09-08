@@ -518,18 +518,22 @@ class AIBot:
 
             # Обработка игр
             elif callback_data == "game_rps":
-                # Устанавливаем активную игру КНБ
-                memory_manager.set_user_active_game(user_id, "rps")
-
-                rps_text = "🪨 <b>Камень-Ножницы-Бумага</b>\n\n🎯 <b>Просто напиши:</b> камень, ножницы или бумага!"
-                await self._safe_edit_message(callback, rps_text, keyboard_manager.get_games_menu())
+                rps_text = "🪨 <b>Камень-Ножницы-Бумага</b>\n\n🎯 <b>Выбери свой ход:</b>"
+                await self._safe_edit_message(callback, rps_text, keyboard_manager.get_rps_choice_menu())
 
             elif callback_data.startswith("rps_"):
                 user_choice = callback_data.split("_", 1)[1]
                 result = game_service.play_rps(user_choice)
 
-                result_text = f"🎮 <b>Результат игры:</b>\n\n{result}"
-                await self._safe_edit_message(callback, result_text, keyboard_manager.get_games_menu())
+                result_text = f"🎮 <b>Результат игры:</b>\n\n{result}\n\n🎯 <b>Выбери свой следующий ход:</b>"
+                await self._safe_edit_message(callback, result_text, keyboard_manager.get_rps_choice_menu())
+
+                # Логируем статистику в БД
+                try:
+                    self.db.log_message(user_id, "game_rps", content=user_choice, response=result)
+                    self.db.update_user_stats(user_id, "total_rps_games")
+                except Exception as e:
+                    log_error(f"Ошибка логирования игры КНБ пользователя {user_id}: {str(e)}")
 
             elif callback_data == "game_dice":
                 new_text = "🎲 <b>Игра в кости</b>\n\nВыбери ставку:"
