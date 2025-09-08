@@ -235,15 +235,15 @@ class MemoryManager:
                     memory_data['messages'].append(msg_copy)
 
                 # Преобразуем даты в metadata
-                if 'created_at' in memory_data['metadata']:
+                if 'created_at' in memory_data['metadata'] and hasattr(memory_data['metadata']['created_at'], 'isoformat'):
                     memory_data['metadata']['created_at'] = memory_data['metadata']['created_at'].isoformat()
-                if 'last_updated' in memory_data['metadata']:
+                if 'last_updated' in memory_data['metadata'] and hasattr(memory_data['metadata']['last_updated'], 'isoformat'):
                     memory_data['metadata']['last_updated'] = memory_data['metadata']['last_updated'].isoformat()
 
                 # Преобразуем даты в game_state
                 if 'game_state' in memory_data['metadata'] and memory_data['metadata']['game_state']:
                     game_state = memory_data['metadata']['game_state']
-                    if 'last_game_time' in game_state and game_state['last_game_time']:
+                    if 'last_game_time' in game_state and game_state['last_game_time'] and hasattr(game_state['last_game_time'], 'isoformat'):
                         game_state['last_game_time'] = game_state['last_game_time'].isoformat()
 
                 data[str(user_id)] = memory_data
