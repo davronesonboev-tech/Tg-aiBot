@@ -407,10 +407,21 @@ class AIBot:
                 bot_dice_value = game_data.get('bot_dice', 0)
 
                 if bot_dice_value > 0:
-                    # У нас есть оба броска - сравниваем результаты
-                    # Эмодзи для кубиков
+                    # Показываем что получили бросок пользователя
                     dice_emojis = {1: '⚀', 2: '⚁', 3: '⚂', 4: '⚃', 5: '⚄', 6: '⚅'}
                     user_emoji = dice_emojis.get(user_dice_value, '🎲')
+
+                    # Ждем немного чтобы пользователь увидел анимацию
+                    import asyncio
+                    await asyncio.sleep(2)
+
+                    # Показываем результат броска пользователя
+                    await message.reply(f"🎲 <b>Твой бросок:</b> {user_emoji} <b>({user_dice_value})</b>\n\n"
+                                       "⏳ <i>Подсчитываю результат...</i>")
+
+                    await asyncio.sleep(1.5)
+
+                    # Эмодзи для кубиков
                     bot_emoji = dice_emojis.get(bot_dice_value, '🎲')
 
                     # Определяем победителя
@@ -837,20 +848,129 @@ class AIBot:
                     await callback.answer("❌ Ошибка данных игры!")
                     return
 
-                # Просим пользователя отправить настоящий dice эмодзи
+                # Предлагаем варианты броска
                 dice_emojis = {1: '⚀', 2: '⚁', 3: '⚂', 4: '⚃', 5: '⚄', 6: '⚅'}
-                instruction_text = "🎲 <b>Твоя очередь бросить настоящий кубик!</b>\n\n" \
+                instruction_text = "🎲 <b>Твоя очередь бросить кубик!</b>\n\n" \
                                   f"🤖 <b>Мой бросок:</b> {dice_emojis.get(bot_dice, '🎲')} <b>({bot_dice})</b>\n\n" \
-                                  "🎯 <b>Отправь эмодзи 🎲 в чат для броска!</b>\n\n" \
-                                  "Жду твой бросок..."
+                                  "🎯 <b>Выбери как бросить кубик:</b>"
+
+                # Создаем клавиатуру с вариантами
+                throw_options = InlineKeyboardMarkup(inline_keyboard=[
+                    [InlineKeyboardButton(text="🎲 Бросить за меня", callback_data=f"dice_auto_throw_{bot_dice}")],
+                    [InlineKeyboardButton(text="🎲 Сам брошу", callback_data=f"dice_manual_throw_{bot_dice}")],
+                    [InlineKeyboardButton(text="🔄 Новая игра", callback_data="game_dice")],
+                    [InlineKeyboardButton(text="⬅️ В меню", callback_data="menu_games")]
+                ])
 
                 # Сохраняем бросок бота для сравнения
                 memory_manager.set_user_active_game(user_id, "dice_waiting", {"bot_dice": bot_dice})
 
-                # Обновляем сообщение с инструкцией
-                await self._safe_edit_message(callback, instruction_text)
+                # Обновляем сообщение с вариантами
+                await self._safe_edit_message(callback, instruction_text, throw_options)
 
                 # Убираем "часики" с кнопки
+                await callback.answer()
+
+            elif callback_data.startswith("dice_auto_throw_"):
+                user_id = callback.from_user.id
+
+                # Извлекаем значение броска бота
+                try:
+                    bot_dice = int(callback_data.split("_")[-1])
+                except (ValueError, IndexError):
+                    await callback.answer("❌ Ошибка данных игры!")
+                    return
+
+                # Показываем что бот бросает кубик за пользователя
+                await self._safe_edit_message(callback, "🎲 <b>Брошу кубик за тебя!</b>\n\n🤖 <i>Подготовка...</i>")
+
+                # Бот отправляет dice эмодзи от имени пользователя
+                try:
+                    dice_message = await callback.bot.send_dice(
+                        chat_id=callback.message.chat.id,
+                        emoji="🎲"
+                    )
+
+                    # Ждем завершения анимации
+                    import asyncio
+                    await asyncio.sleep(4)
+
+                    # Получаем результат броска пользователя
+                    user_dice_value = dice_message.dice.value
+
+                    # Показываем результат броска пользователя
+                    dice_emojis = {1: '⚀', 2: '⚁', 3: '⚂', 4: '⚃', 5: '⚄', 6: '⚅'}
+                    user_emoji = dice_emojis.get(user_dice_value, '🎲')
+                    bot_emoji = dice_emojis.get(bot_dice, '🎲')
+
+                    result_text = "🎲 <b>Твой бросок завершен!</b>\n\n" \
+                                 f"🤖 <b>Мой бросок:</b> {bot_emoji} <b>({bot_dice})</b>\n" \
+                                 f"🎯 <b>Твой бросок:</b> {user_emoji} <b>({user_dice_value})</b>\n\n"
+
+                    # Определяем победителя
+                    if user_dice_value > bot_dice:
+                        result = "🏆 <b>Ты победил!</b>"
+                        winner = "user"
+                        extra_msg = "🎯 Отличный бросок!"
+                    elif user_dice_value < bot_dice:
+                        result = "😎 <b>Я выиграл!</b>"
+                        winner = "bot"
+                        extra_msg = "🤖 Я был лучше!"
+                    else:
+                        result = "🤝 <b>Ничья!</b>"
+                        winner = "draw"
+                        extra_msg = "⚖️ Равные силы!"
+
+                    final_result = f"{result_text}{result}\n<i>{extra_msg}</i>"
+
+                    # Очищаем режим игры
+                    memory_manager.clear_user_active_game(user_id)
+
+                    # Показываем финальный результат
+                    from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+                    continue_menu = InlineKeyboardMarkup(inline_keyboard=[
+                        [InlineKeyboardButton(text="🎲 Сыграть еще", callback_data="dice_throw_again")],
+                        [InlineKeyboardButton(text="📊 Статистика", callback_data="dice_stats")],
+                        [InlineKeyboardButton(text="📚 История", callback_data="dice_history")],
+                        [InlineKeyboardButton(text="⬅️ В меню", callback_data="menu_main")]
+                    ])
+
+                    await self._safe_edit_message(callback, final_result, continue_menu)
+
+                    # Логируем статистику
+                    try:
+                        self.db.log_message(user_id, "game_dice", content=f"user:{user_dice_value}_bot:{bot_dice}", response=final_result)
+                        self.db.update_user_stats(user_id, "total_rps_games")
+                    except Exception as e:
+                        log_error(f"Ошибка логирования игры в кости пользователя {user_id}: {str(e)}")
+
+                except Exception as e:
+                    log_error(f"Ошибка автоматического броска кубика: {e}")
+                    await self._safe_edit_message(callback, "❌ <b>Ошибка броска кубика!</b>\n\nПопробуй отправить 🎲 вручную!")
+
+                await callback.answer()
+
+            elif callback_data.startswith("dice_manual_throw_"):
+                user_id = callback.from_user.id
+
+                # Извлекаем значение броска бота
+                try:
+                    bot_dice = int(callback_data.split("_")[-1])
+                except (ValueError, IndexError):
+                    await callback.answer("❌ Ошибка данных игры!")
+                    return
+
+                # Просим пользователя отправить эмодзи вручную
+                dice_emojis = {1: '⚀', 2: '⚁', 3: '⚂', 4: '⚃', 5: '⚄', 6: '⚅'}
+                manual_text = "🎲 <b>Отправь эмодзи вручную!</b>\n\n" \
+                             f"🤖 <b>Мой бросок:</b> {dice_emojis.get(bot_dice, '🎲')} <b>({bot_dice})</b>\n\n" \
+                             "🎯 <b>Отправь эмодзи 🎲 в чат для броска!</b>\n\n" \
+                             "Жду твой бросок..."
+
+                # Сохраняем бросок бота
+                memory_manager.set_user_active_game(user_id, "dice_waiting", {"bot_dice": bot_dice})
+
+                await self._safe_edit_message(callback, manual_text)
                 await callback.answer()
 
             elif callback_data == "dice_throw_again":
