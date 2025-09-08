@@ -2,7 +2,10 @@
 -- Выполните этот скрипт в Railway Database -> Query
 -- Добавьте новое поле, если его нет:
 -- ALTER TABLE users ADD COLUMN IF NOT EXISTS total_quiz_games INTEGER DEFAULT 0;
--- Версия: 1.0 | Дата: 2025-09-08
+-- Версия: 1.1 | Дата: 2025-09-08
+-- Добавьте недостающие поля, если они отсутствуют:
+-- ALTER TABLE users ADD COLUMN IF NOT EXISTS total_rps_games INTEGER DEFAULT 0;
+-- ALTER TABLE users ADD COLUMN IF NOT EXISTS total_quiz_games INTEGER DEFAULT 0;
 
 -- Создание таблицы пользователей
 CREATE TABLE IF NOT EXISTS users (
