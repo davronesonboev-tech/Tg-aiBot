@@ -1,5 +1,7 @@
 -- SQL скрипт для создания таблиц в PostgreSQL
 -- Выполните этот скрипт в Railway Database -> Query
+-- Добавьте новое поле, если его нет:
+-- ALTER TABLE users ADD COLUMN IF NOT EXISTS total_quiz_games INTEGER DEFAULT 0;
 -- Версия: 1.0 | Дата: 2025-09-08
 
 -- Создание таблицы пользователей
