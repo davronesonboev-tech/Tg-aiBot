@@ -35,6 +35,7 @@ class User(Base):
     total_quotes = Column(Integer, default=0)
     total_calculations = Column(Integer, default=0)
     total_translations = Column(Integer, default=0)
+    total_rps_games = Column(Integer, default=0)
     total_weather_requests = Column(Integer, default=0)
 
     # Время
@@ -59,6 +60,7 @@ class User(Base):
             "total_quotes": self.total_quotes,
             "total_calculations": self.total_calculations,
             "total_translations": self.total_translations,
+            "total_rps_games": self.total_rps_games,
             "total_weather_requests": self.total_weather_requests,
             "created_at": self.created_at.isoformat() if self.created_at else None,
             "last_active": self.last_active.isoformat() if self.last_active else None,
@@ -207,6 +209,7 @@ class DatabaseManager:
                 user.total_quotes = 0
                 user.total_calculations = 0
                 user.total_translations = 0
+                user.total_rps_games = 0
                 user.total_weather_requests = 0
                 session.commit()
 
@@ -230,6 +233,7 @@ class DatabaseManager:
                 User.total_quotes: 0,
                 User.total_calculations: 0,
                 User.total_translations: 0,
+                User.total_rps_games: 0,
                 User.total_weather_requests: 0
             })
 
