@@ -6,7 +6,7 @@
 import re
 import random
 import requests
-from typing import Optional, Tuple, List
+from typing import Optional, Tuple, List, Dict, Any
 from datetime import datetime
 
 from logger import log_info, log_error
