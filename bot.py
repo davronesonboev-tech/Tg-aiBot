@@ -311,13 +311,15 @@ class AIBot:
                               "Примеры:\n"
                               "• /rps камень\n"
                               "• /камень ножницы\n"
-                              "• /rps бумага")
+                              "• /rps бумага\n\n"
+                              "💡 Или используй кнопки в меню '🎮 Игры'!",
+                              reply_markup=keyboard_manager.get_menu_button())
             return
 
         user_choice = args[1].strip().lower()
-        result = game_service.play_rps(user_choice)
+        result_text, game_data = game_service.play_rps(user_choice, user_id)
 
-        await message.reply(result)
+        await message.reply(result_text, reply_markup=keyboard_manager.get_menu_button())
         log_info(f"Игра КНБ: пользователь выбрал {user_choice}", user_id)
 
     async def cmd_game_guess(self, message: types.Message):
@@ -524,17 +526,107 @@ class AIBot:
 
             elif callback_data.startswith("rps_"):
                 user_choice = callback_data.split("_", 1)[1]
-                result = game_service.play_rps(user_choice)
+                result_text, game_data = game_service.play_rps(user_choice, user_id)
 
-                result_text = f"🎮 <b>Результат игры:</b>\n\n{result}\n\n🎯 <b>Выбери свой следующий ход:</b>"
-                await self._safe_edit_message(callback, result_text, keyboard_manager.get_rps_choice_menu())
+                # Создаем расширенное меню с историей и статистикой
+                rps_menu = keyboard_manager.get_rps_choice_menu()
 
-                # Логируем статистику в БД
+                # Добавляем кнопки для истории и статистики
+                from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+                if isinstance(rps_menu, InlineKeyboardMarkup):
+                    # Копируем существующие кнопки
+                    buttons = []
+                    for row in rps_menu.inline_keyboard:
+                        buttons.extend(row)
+
+                    # Добавляем новые кнопки
+                    buttons.append(InlineKeyboardButton(text="📊 Статистика", callback_data="rps_stats"))
+                    buttons.append(InlineKeyboardButton(text="📚 История", callback_data="rps_history"))
+
+                    # Перестраиваем клавиатуру
+                    new_keyboard = []
+                    for i in range(0, len(buttons), 2):
+                        new_keyboard.append(buttons[i:i+2])
+
+                    rps_menu = InlineKeyboardMarkup(inline_keyboard=new_keyboard)
+
+                game_result_text = f"🎮 <b>Результат игры:</b>\n\n{result_text}\n\n🎯 <b>Выбери свой следующий ход:</b>"
+                await self._safe_edit_message(callback, game_result_text, rps_menu)
+
+                # Логируем статистику в БД с новыми данными
                 try:
-                    self.db.log_message(user_id, "game_rps", content=user_choice, response=result)
+                    self.db.log_message(user_id, "game_rps", content=user_choice, response=result_text)
                     self.db.update_user_stats(user_id, "total_rps_games")
                 except Exception as e:
                     log_error(f"Ошибка логирования игры КНБ пользователя {user_id}: {str(e)}")
+
+            elif callback_data == "rps_stats":
+                # Показываем статистику игр
+                stats = game_service.get_rps_stats(user_id)
+
+                if stats['total_games'] == 0:
+                    stats_text = "📊 <b>Статистика игр</b>\n\n" \
+                               "🎮 Ты еще не играл в камень-ножницы-бумага!\n" \
+                               "🪨 Начни игру, чтобы увидеть статистику."
+                else:
+                    # Эмодзи для результатов
+                    trophy = "🏆" if stats['win_rate'] >= 60 else "🎯" if stats['win_rate'] >= 40 else "💪"
+
+                    stats_text = f"📊 <b>Статистика игр</b>\n\n" \
+                               f"🎮 <b>Всего игр:</b> {stats['total_games']}\n" \
+                               f"🏆 <b>Побед:</b> {stats['user_wins']}\n" \
+                               f"😢 <b>Поражений:</b> {stats['bot_wins']}\n" \
+                               f"🤝 <b>Ничьих:</b> {stats['draws']}\n" \
+                               f"{trophy} <b>Процент побед:</b> {stats['win_rate']}%\n\n"
+
+                    # Добавляем статистику по выборам
+                    if stats['user_choices']:
+                        stats_text += "<b>Твои любимые ходы:</b>\n"
+                        for choice, count in sorted(stats['user_choices'].items(), key=lambda x: x[1], reverse=True):
+                            emoji = {'камень': '🪨', 'ножницы': '✂️', 'бумага': '📄'}.get(choice, '❓')
+                            stats_text += f"{emoji} {choice.capitalize()}: {count}\n"
+
+                await self._safe_edit_message(callback, stats_text, keyboard_manager.get_rps_stats_menu())
+
+            elif callback_data == "rps_history":
+                # Показываем историю последних игр
+                history = game_service.get_rps_history(user_id, limit=10)
+
+                if not history:
+                    history_text = "📚 <b>История игр</b>\n\n" \
+                                 "🎮 Ты еще не играл в камень-ножницы-бумага!\n" \
+                                 "🪨 Начни игру, чтобы создать историю."
+                else:
+                    history_text = f"📚 <b>Последние {len(history)} игр</b>\n\n"
+
+                    for i, game in enumerate(history, 1):
+                        # Эмодзи для выбора
+                        user_choice_emoji = {'камень': '🪨', 'ножницы': '✂️', 'бумага': '📄'}.get(game['user_choice'], '❓')
+                        bot_choice_emoji = {'камень': '🪨', 'ножницы': '✂️', 'бумага': '📄'}.get(game['bot_choice'], '❓')
+
+                        # Эмодзи для результата
+                        result_emoji = {
+                            'user_win': '🏆',
+                            'bot_win': '😢',
+                            'draw': '🤝'
+                        }.get(game['result'], '❓')
+
+                        # Форматируем время
+                        timestamp = ""
+                        if game.get('timestamp'):
+                            try:
+                                from datetime import datetime
+                                dt = datetime.fromisoformat(game['timestamp'].replace('Z', '+00:00'))
+                                timestamp = dt.strftime("%H:%M")
+                            except:
+                                pass
+
+                        history_text += f"{i}. {user_choice_emoji} vs {bot_choice_emoji} {result_emoji}"
+                        if timestamp:
+                            history_text += f" ({timestamp})"
+                        history_text += "\n"
+
+                await self._safe_edit_message(callback, history_text, keyboard_manager.get_rps_history_menu())
 
             elif callback_data == "game_dice":
                 new_text = "🎲 <b>Игра в кости</b>\n\nВыбери ставку:"
@@ -1506,9 +1598,19 @@ class AIBot:
                 # Проверяем выбор в камень-ножницы-бумага
                 choices = ['камень', 'ножницы', 'бумага']
                 if text.lower() in choices:
-                    result = game_service.play_rps(text.lower())
+                    result_text, game_data = game_service.play_rps(text.lower(), user_id)
                     memory_manager.clear_user_active_game(user_id)
-                    await message.reply(f"🎮 <b>Результат игры:</b>\n\n{result}\n\nХочешь сыграть еще? Нажми '🪨 Камень-Ножницы-Бумага'!", reply_markup=keyboard_manager.get_menu_button())
+
+                    # Показываем результат и меню для продолжения
+                    from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+                    continue_menu = InlineKeyboardMarkup(inline_keyboard=[
+                        [InlineKeyboardButton(text="🪨 Сыграть еще", callback_data="game_rps")],
+                        [InlineKeyboardButton(text="📊 Статистика", callback_data="rps_stats")],
+                        [InlineKeyboardButton(text="📚 История", callback_data="rps_history")],
+                        [InlineKeyboardButton(text="⬅️ В меню", callback_data="menu_main")]
+                    ])
+
+                    await message.reply(f"🎮 <b>Результат игры:</b>\n\n{result_text}\n\nХочешь сыграть еще?", reply_markup=continue_menu)
                     return True
 
             elif active_game == "magic_ball":
