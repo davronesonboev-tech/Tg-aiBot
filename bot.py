@@ -615,7 +615,7 @@ class AIBot:
                     if "Правильно" in result:
                         # Викторина окончена
                         memory_manager.clear_user_active_game(user_id)
-                        await message.reply(f"🧠 {result}\n\nХочешь ответить на еще один вопрос? Нажми на кнопку '🧠 Викторина' в меню!", reply_markup=keyboard_manager.get_menu_button())
+                        await callback.message.reply(f"🧠 {result}\n\nХочешь ответить на еще один вопрос? Нажми на кнопку '🧠 Викторина' в меню!", reply_markup=keyboard_manager.get_menu_button())
 
                         # Логируем статистику в БД
                         try:
@@ -638,8 +638,15 @@ class AIBot:
                 # Показываем подсказку для викторины
                 game_data = memory_manager.get_user_game_data(user_id)
 
-                if game_data and 'hint' in game_data:
-                    hint_text = f"💡 <b>Подсказка:</b>\n\n{game_data['hint']}\n\n🎯 <b>Теперь выбери ответ:</b>"
+                if game_data and 'hint' in game_data and 'question' in game_data:
+                    # Получаем текущее сообщение и добавляем подсказку
+                    current_text = callback.message.text or ""
+                    question = game_data['question']
+                    hint = game_data['hint']
+
+                    # Создаем новый текст с подсказкой
+                    hint_text = f"🧠 <b>Викторина:</b>\n\n❓ {question}\n\n💡 <b>Подсказка:</b> {hint}\n\n🎯 <b>Выбери правильный ответ:</b>"
+
                     options = game_data.get('options', [])
                     if options:
                         await self._safe_edit_message(callback, hint_text, keyboard_manager.get_quiz_answers_menu(options))
@@ -1247,7 +1254,7 @@ class AIBot:
                         if "Правильно" in result:
                             # Викторина окончена
                             memory_manager.clear_user_active_game(user_id)
-                            await message.reply(f"🧠 {result}\n\nХочешь ответить на еще один вопрос? Нажми на кнопку '🧠 Викторина' в меню!", reply_markup=keyboard_manager.get_menu_button())
+                            await callback.message.reply(f"🧠 {result}\n\nХочешь ответить на еще один вопрос? Нажми на кнопку '🧠 Викторина' в меню!", reply_markup=keyboard_manager.get_menu_button())
 
                             # Логируем статистику в БД
                             try:
