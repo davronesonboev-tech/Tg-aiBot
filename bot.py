@@ -451,8 +451,6 @@ class AIBot:
                     # Показываем результат
                     continue_menu = InlineKeyboardMarkup(inline_keyboard=[
                         [InlineKeyboardButton(text="🎲 Сыграть еще", callback_data="dice_throw_again")],
-                        [InlineKeyboardButton(text="📊 Статистика", callback_data="dice_stats")],
-                        [InlineKeyboardButton(text="📚 История", callback_data="dice_history")],
                         [InlineKeyboardButton(text="⬅️ В меню", callback_data="menu_main")]
                     ])
 
@@ -509,8 +507,6 @@ class AIBot:
         # Показываем результат
         continue_menu = InlineKeyboardMarkup(inline_keyboard=[
             [InlineKeyboardButton(text="🎲 Сыграть еще", callback_data="dice_throw_again")],
-            [InlineKeyboardButton(text="📊 Статистика", callback_data="dice_stats")],
-            [InlineKeyboardButton(text="📚 История", callback_data="dice_history")],
             [InlineKeyboardButton(text="⬅️ В меню", callback_data="menu_main")]
         ])
 
@@ -925,8 +921,6 @@ class AIBot:
                     # Показываем финальный результат
                     continue_menu = InlineKeyboardMarkup(inline_keyboard=[
                         [InlineKeyboardButton(text="🎲 Сыграть еще", callback_data="dice_throw_again")],
-                        [InlineKeyboardButton(text="📊 Статистика", callback_data="dice_stats")],
-                        [InlineKeyboardButton(text="📚 История", callback_data="dice_history")],
                         [InlineKeyboardButton(text="⬅️ В меню", callback_data="menu_main")]
                     ])
 
