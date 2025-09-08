@@ -575,14 +575,13 @@ class AIBot:
                     # Устанавливаем активную викторину с правильным ответом
                     memory_manager.set_user_active_game(user_id, "quiz", {
                         'correct_answer': quiz_data['correct_answer'],
-                        'hint': quiz_data['hint']
+                        'hint': quiz_data['hint'],
+                        'options': quiz_data['options'],
+                        'question': quiz_data['question']
                     })
 
-                    # Форматируем варианты ответов
-                    options_text = "\n".join([f"{i+1}. {opt}" for i, opt in enumerate(quiz_data['options'])])
-
-                    quiz_text = f"🧠 <b>Викторина:</b>\n\n❓ {quiz_data['question']}\n\n{options_text}\n\n🎯 <b>Напиши номер ответа!</b> (1-4)"
-                    await self._safe_edit_message(callback, quiz_text, keyboard_manager.get_games_menu())
+                    quiz_text = f"🧠 <b>Викторина:</b>\n\n❓ {quiz_data['question']}\n\n🎯 <b>Выбери правильный ответ:</b>"
+                    await self._safe_edit_message(callback, quiz_text, keyboard_manager.get_quiz_answers_menu(quiz_data['options']))
                 else:
                     # Fallback на старый метод при ошибке AI
                     correct_answer = "1"
@@ -600,6 +599,54 @@ class AIBot:
 
                 ball_text = "🎱 <b>Волшебный шар</b>\n\n🎯 <b>Просто задай вопрос!</b>\nНапример: 'Будет ли завтра дождь?' или 'Стоит ли мне учиться?'"
                 await self._safe_edit_message(callback, ball_text, keyboard_manager.get_games_menu())
+
+            elif callback_data.startswith("quiz_answer_"):
+                # Обработка ответа на викторину
+                user_answer = callback_data.split("_", 2)[2]  # Получаем номер ответа (1, 2, 3, 4)
+                game_data = memory_manager.get_user_game_data(user_id)
+
+                if game_data and 'correct_answer' in game_data:
+                    correct_answer = game_data['correct_answer']
+                    question = game_data.get('question', '')
+                    options = game_data.get('options', [])
+
+                    result = game_service.check_quiz_answer(question, user_answer, correct_answer)
+
+                    if "Правильно" in result:
+                        # Викторина окончена
+                        memory_manager.clear_user_active_game(user_id)
+                        await message.reply(f"🧠 {result}\n\nХочешь ответить на еще один вопрос? Нажми на кнопку '🧠 Викторина' в меню!", reply_markup=keyboard_manager.get_menu_button())
+
+                        # Логируем статистику в БД
+                        try:
+                            self.db.update_user_stats(user_id, "total_quiz_games")
+                        except Exception as e:
+                            log_error(f"Ошибка логирования викторины пользователя {user_id}: {str(e)}")
+                    else:
+                        # Показываем подсказку и даем возможность выбрать другой ответ
+                        hint = game_data.get('hint', 'Подсказка недоступна')
+                        wrong_text = f"❌ <b>Неправильно!</b>\n\n💡 <b>Подсказка:</b> {hint}\n\n🎯 <b>Попробуй выбрать другой ответ:</b>"
+
+                        if options:
+                            await self._safe_edit_message(callback, wrong_text, keyboard_manager.get_quiz_answers_menu(options))
+                        else:
+                            await callback.answer("❌ Ошибка загрузки вариантов ответов")
+                else:
+                    await callback.answer("❌ Игра не найдена")
+
+            elif callback_data == "quiz_hint":
+                # Показываем подсказку для викторины
+                game_data = memory_manager.get_user_game_data(user_id)
+
+                if game_data and 'hint' in game_data:
+                    hint_text = f"💡 <b>Подсказка:</b>\n\n{game_data['hint']}\n\n🎯 <b>Теперь выбери ответ:</b>"
+                    options = game_data.get('options', [])
+                    if options:
+                        await self._safe_edit_message(callback, hint_text, keyboard_manager.get_quiz_answers_menu(options))
+                    else:
+                        await callback.answer("❌ Ошибка загрузки вариантов ответов")
+                else:
+                    await callback.answer("❌ Подсказка недоступна")
 
             # Обработка инструментов
             elif callback_data == "tool_calc":
@@ -1208,7 +1255,18 @@ class AIBot:
                             except Exception as e:
                                 log_error(f"Ошибка логирования викторины пользователя {user_id}: {str(e)}")
                         else:
-                            await message.reply(f"📚 {result}", reply_markup=keyboard_manager.get_menu_button())
+                            # Для викторины с кнопками - показываем подсказку и даем выбрать другой ответ
+                            game_data = memory_manager.get_user_game_data(user_id)
+                            hint = game_data.get('hint', 'Подсказка недоступна') if game_data else 'Подсказка недоступна'
+                            options = game_data.get('options', []) if game_data else []
+
+                            if options:
+                                # Если есть данные викторины, показываем кнопки для повторного выбора
+                                wrong_text = f"❌ <b>Неправильно!</b>\n\n💡 <b>Подсказка:</b> {hint}\n\n🎯 <b>Попробуй выбрать другой ответ:</b>"
+                                await message.reply(wrong_text, reply_markup=keyboard_manager.get_quiz_answers_menu(options))
+                            else:
+                                # Fallback для старого формата
+                                await message.reply(f"📚 {result}", reply_markup=keyboard_manager.get_menu_button())
                         return True
 
             elif active_game == "rps":
