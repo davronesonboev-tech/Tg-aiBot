@@ -690,7 +690,7 @@ class AIBot:
                 new_text = "🛠️ <b>Инструменты и помощники:</b>\n\nПолезные инструменты для повседневных задач!"
                 await self._safe_edit_message(callback, new_text, keyboard_manager.get_tools_menu())
 
-            elif callback_data == "back_to_main":
+            elif callback_data == "back_to_main" or callback_data == "menu_main":
                 current_persona = persona_manager.get_current_persona()
                 welcome_text = (
                     "🤖 <b>Привет! Я ИИ-бот, созданный Javohir Zokirjonov</b>\n\n"
