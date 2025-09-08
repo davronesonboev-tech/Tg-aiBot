@@ -323,15 +323,16 @@ class WeatherService:
 class GameService:
     """Сервис для простых игр."""
 
-    def play_rps(self, user_choice: str) -> str:
+    def play_rps(self, user_choice: str, user_id: int = None) -> Tuple[str, Dict[str, Any]]:
         """
-        Игра камень-ножницы-бумага.
+        Улучшенная игра камень-ножницы-бумага с умной логикой бота.
 
         Args:
             user_choice: Выбор пользователя (rock/scissors/paper или камень/ножницы/бумага)
+            user_id: ID пользователя для истории и статистики
 
         Returns:
-            str: Результат игры
+            Tuple[str, Dict[str, Any]]: Результат игры и данные для истории
         """
         # Преобразование английских названий в русские
         choice_map = {
@@ -348,21 +349,256 @@ class GameService:
         user_choice = user_choice.lower().strip()
 
         if user_choice not in choices:
-            return "❌ Выберите: камень, ножницы или бумага!"
+            return "❌ Выберите: камень, ножницы или бумага!", {}
 
-        bot_choice = random.choice(choices)
+        # Умный выбор бота
+        bot_choice = self._get_smart_bot_choice(user_choice, user_id)
 
-        result = ""
+        # Определяем победителя
+        result, winner = self._determine_rps_winner(user_choice, bot_choice)
+
+        # Создаем красивый результат
+        result_text = self._format_rps_result(user_choice, bot_choice, result, winner)
+
+        # Данные для истории
+        game_data = {
+            'user_choice': user_choice,
+            'bot_choice': bot_choice,
+            'result': result,
+            'winner': winner,
+            'timestamp': datetime.now().isoformat()
+        }
+
+        return result_text, game_data
+
+    def _get_smart_bot_choice(self, user_choice: str, user_id: int = None) -> str:
+        """
+        Умный выбор бота на основе паттернов пользователя.
+
+        Args:
+            user_choice: Выбор пользователя
+            user_id: ID пользователя
+
+        Returns:
+            str: Выбор бота
+        """
+        import secrets
+        choices = ['камень', 'ножницы', 'бумага']
+
+        # Базовые вероятности (умный выбор)
+        weights = [1.0, 1.0, 1.0]  # По умолчанию равные
+
+        # Правила игры: что бьет что
+        counter_moves = {
+            'камень': 'бумага',      # Бумага бьет камень
+            'ножницы': 'камень',     # Камень бьет ножницы
+            'бумага': 'ножницы'      # Ножницы бьют бумагу
+        }
+
+        # Увеличиваем вероятность контр-хода на 30%
+        if user_choice in counter_moves:
+            counter_choice = counter_moves[user_choice]
+            counter_index = choices.index(counter_choice)
+            weights[counter_index] *= 1.3
+
+        # Добавляем элемент случайности (20% шанс выбрать что-то неожиданное)
+        if secrets.randbelow(100) < 20:
+            # Случайный выбор с небольшим преимуществом для контр-хода
+            weights = [1.0, 1.0, 1.0]
+            weights[choices.index(counter_moves.get(user_choice, choices[0]))] = 1.2
+
+        # Нормализуем веса
+        total_weight = sum(weights)
+        weights = [w / total_weight for w in weights]
+
+        # Выбираем с учетом весов
+        rand_val = secrets.randbelow(1000) / 1000.0
+        cumulative = 0.0
+        for i, weight in enumerate(weights):
+            cumulative += weight
+            if rand_val <= cumulative:
+                return choices[i]
+
+        return choices[0]  # Fallback
+
+    def _determine_rps_winner(self, user_choice: str, bot_choice: str) -> Tuple[str, str]:
+        """
+        Определяет победителя игры.
+
+        Returns:
+            Tuple[str, str]: (результат, победитель)
+        """
         if user_choice == bot_choice:
-            result = "🤝 Ничья!"
-        elif (user_choice == 'камень' and bot_choice == 'ножницы') or \
-             (user_choice == 'ножницы' and bot_choice == 'бумага') or \
-             (user_choice == 'бумага' and bot_choice == 'камень'):
-            result = "🎉 Ты победил!"
-        else:
-            result = "😢 Я победил!"
+            return "🤝 Ничья!", "draw"
 
-        return f"🤖 Я выбрал: {bot_choice}\n🧑 Ты выбрал: {user_choice}\n\n{result}"
+        # Правила игры: что бьет что
+        # камень бьет ножницы, ножницы бьют бумагу, бумага бьет камень
+        win_conditions = {
+            'камень': 'ножницы',     # камень побеждает ножницы
+            'ножницы': 'бумага',     # ножницы побеждают бумагу
+            'бумага': 'камень'       # бумага побеждает камень
+        }
+
+        # Проверяем, побеждает ли пользователь
+        if win_conditions[user_choice] == bot_choice:
+            return "🎉 Ты победил!", "user"
+        # Проверяем, побеждает ли бот
+        elif win_conditions[bot_choice] == user_choice:
+            return "😢 Я победил!", "bot"
+        else:
+            # Это не должно случаться, но на всякий случай
+            return "🤝 Ничья!", "draw"
+
+    def _format_rps_result(self, user_choice: str, bot_choice: str, result: str, winner: str) -> str:
+        """
+        Форматирует красивый результат игры.
+
+        Returns:
+            str: Отформатированный результат
+        """
+        # Эмодзи для выбора
+        choice_emojis = {
+            'камень': '🪨',
+            'ножницы': '✂️',
+            'бумага': '📄'
+        }
+
+        user_emoji = choice_emojis.get(user_choice, '❓')
+        bot_emoji = choice_emojis.get(bot_choice, '❓')
+
+        # Дополнительные сообщения в зависимости от результата
+        extra_messages = {
+            "user": [
+                "🎯 Отличный ход!",
+                "🏆 Ты мастер!",
+                "💪 Сила в тебе!",
+                "🔥 Жгучая победа!",
+                "⚡ Молниеносная победа!"
+            ],
+            "bot": [
+                "🤖 Я предвидел это!",
+                "🎭 Следующий раз повезет!",
+                "🧠 Я анализирую твои ходы!",
+                "💡 Попробуй другую стратегию!",
+                "🎪 ИИ всегда на шаг впереди!"
+            ],
+            "draw": [
+                "🤝 Равные соперники!",
+                "⚖️ Баланс сил!",
+                "🔄 Круг замкнулся!",
+                "🎭 Игра продолжается!",
+                "⚡ Энергия накапливается!"
+            ]
+        }
+
+        import secrets
+        extra_msg = secrets.choice(extra_messages.get(winner, ["🎮 Продолжаем игру!"]))
+
+        return f"{user_emoji} <b>Твой выбор:</b> {user_choice.capitalize()}\n" \
+               f"{bot_emoji} <b>Мой выбор:</b> {bot_choice.capitalize()}\n\n" \
+               f"<b>{result}</b>\n" \
+               f"<i>{extra_msg}</i>"
+
+    def get_rps_history(self, user_id: int, limit: int = 10) -> List[Dict[str, Any]]:
+        """
+        Получает историю игр пользователя в камень-ножницы-бумага.
+
+        Args:
+            user_id: ID пользователя
+            limit: Максимальное количество записей
+
+        Returns:
+            List[Dict[str, Any]]: Список последних игр
+        """
+        try:
+            from database import DatabaseManager
+            db = DatabaseManager()
+            session = db.Session()
+
+            # Получаем последние игры RPS пользователя
+            from database import MessageLog
+            games = session.query(MessageLog).filter(
+                MessageLog.user_id == user_id,
+                MessageLog.message_type == "game_rps"
+            ).order_by(MessageLog.created_at.desc()).limit(limit).all()
+
+            history = []
+            for game in games:
+                try:
+                    # Парсим данные из JSON в response
+                    import json
+                    if game.response:
+                        # Ищем паттерн в ответе для извлечения данных
+                        response_lines = game.response.split('\n')
+                        user_choice = ""
+                        bot_choice = ""
+                        result = ""
+
+                        for line in response_lines:
+                            if "Твой выбор:" in line:
+                                user_choice = line.split(":")[-1].strip().lower()
+                            elif "Мой выбор:" in line:
+                                bot_choice = line.split(":")[-1].strip().lower()
+                            elif any(x in line for x in ["🎉 Ты победил", "😢 Я победил", "🤝 Ничья"]):
+                                if "🎉 Ты победил" in line:
+                                    result = "user_win"
+                                elif "😢 Я победил" in line:
+                                    result = "bot_win"
+                                else:
+                                    result = "draw"
+
+                        if user_choice and bot_choice:
+                            history.append({
+                                'user_choice': user_choice,
+                                'bot_choice': bot_choice,
+                                'result': result,
+                                'timestamp': game.created_at.isoformat() if game.created_at else None
+                            })
+                except Exception as e:
+                    continue
+
+            session.close()
+            return history
+
+        except Exception as e:
+            return []
+
+    def get_rps_stats(self, user_id: int) -> Dict[str, Any]:
+        """
+        Получает статистику игр пользователя в камень-ножницы-бумага.
+
+        Args:
+            user_id: ID пользователя
+
+        Returns:
+            Dict[str, Any]: Статистика игр
+        """
+        history = self.get_rps_history(user_id, limit=1000)  # Получаем много игр для статистики
+
+        total_games = len(history)
+        user_wins = sum(1 for game in history if game['result'] == 'user_win')
+        bot_wins = sum(1 for game in history if game['result'] == 'bot_win')
+        draws = sum(1 for game in history if game['result'] == 'draw')
+
+        # Статистика по выборам
+        user_choices = {}
+        bot_choices = {}
+        for game in history:
+            user_choices[game['user_choice']] = user_choices.get(game['user_choice'], 0) + 1
+            bot_choices[game['bot_choice']] = bot_choices.get(game['bot_choice'], 0) + 1
+
+        # Процент побед
+        win_rate = (user_wins / total_games * 100) if total_games > 0 else 0
+
+        return {
+            'total_games': total_games,
+            'user_wins': user_wins,
+            'bot_wins': bot_wins,
+            'draws': draws,
+            'win_rate': round(win_rate, 1),
+            'user_choices': user_choices,
+            'bot_choices': bot_choices
+        }
 
     def guess_number_game(self, difficulty: str = 'medium') -> Tuple[str, int]:
         """
