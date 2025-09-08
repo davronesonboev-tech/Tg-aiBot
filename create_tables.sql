@@ -19,6 +19,7 @@ CREATE TABLE IF NOT EXISTS users (
     total_calculations INTEGER DEFAULT 0,
     total_translations INTEGER DEFAULT 0,
     total_rps_games INTEGER DEFAULT 0,
+    total_quiz_games INTEGER DEFAULT 0,
     total_weather_requests INTEGER DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     last_active TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
