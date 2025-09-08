@@ -104,16 +104,17 @@ class KeyboardManager:
         """Клавиатура с вариантами ответов викторины."""
         builder = InlineKeyboardBuilder()
 
-        # Добавляем варианты ответов как кнопки
+        # Добавляем варианты ответов как кнопки с цифрами
         for i, option in enumerate(options):
-            # Обрезаем длинные варианты, чтобы поместились на кнопку
-            button_text = option[:30] + "..." if len(option) > 30 else option
+            # Показываем цифру + начало варианта (до 25 символов)
+            short_option = option[:25] + "..." if len(option) > 25 else option
+            button_text = f"{i+1}. {short_option}"
             builder.button(text=button_text, callback_data=f"quiz_answer_{i+1}")
 
         builder.button(text="💡 Подсказка", callback_data="quiz_hint")
         builder.button(text="⬅️ Назад в игры", callback_data="menu_games")
 
-        builder.adjust(1, 1, 1, 1, 1, 2)  # 4 варианта + подсказка + назад
+        builder.adjust(1, 1, 1, 1, 2)  # 4 варианта + подсказка + назад
 
         return builder.as_markup()
 
