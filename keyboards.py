@@ -163,7 +163,7 @@ class KeyboardManager:
         builder.button(text="🎲 Случайная отрасль", callback_data="quiz_industry_случайная")
         builder.button(text="⬅️ Назад к настройкам", callback_data="quiz_settings")
 
-        builder.adjust(2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1)
+        builder.adjust(2)  # Все кнопки в 2 колонки
         return builder.as_markup()
 
     @staticmethod
