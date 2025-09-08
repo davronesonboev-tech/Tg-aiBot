@@ -100,9 +100,13 @@ class KeyboardManager:
         return builder.as_markup()
 
     @staticmethod
-    def get_quiz_answers_menu(options: List[str]) -> InlineKeyboardMarkup:
+    def get_quiz_answers_menu(options: List[str], total_questions: int = 10, used_hints: int = 0) -> InlineKeyboardMarkup:
         """Клавиатура с вариантами ответов викторины."""
         builder = InlineKeyboardBuilder()
+
+        # Рассчитываем доступные подсказки
+        max_hints = max(0, (total_questions - 5) // 5)
+        remaining_hints = max(0, max_hints - used_hints)
 
         # Добавляем варианты ответов как кнопки с цифрами
         for i, option in enumerate(options):
@@ -111,7 +115,13 @@ class KeyboardManager:
             button_text = f"{i+1}. {short_option}"
             builder.button(text=button_text, callback_data=f"quiz_answer_{i+1}")
 
-        builder.button(text="💡 Подсказка", callback_data="quiz_hint")
+        # Кнопка подсказки с количеством
+        if max_hints > 0:
+            hint_text = f"💡 Подсказка ({remaining_hints}/{max_hints})"
+            builder.button(text=hint_text, callback_data="quiz_hint")
+        else:
+            builder.button(text="❌ Подсказки недоступны", callback_data="quiz_hint_disabled")
+
         builder.button(text="⬅️ Назад в игры", callback_data="menu_games")
 
         builder.adjust(1, 1, 1, 1, 2)  # 4 варианта + подсказка + назад
