@@ -618,9 +618,11 @@ class AIBot:
 
                         if is_correct:
                             quiz_session['correct_answers'] += 1
-                            result_text = "✅ <b>Правильно!</b> 🎉"
+                            result_emoji = "✅"
+                            result_text = "Правильно!"
                         else:
-                            result_text = f"❌ <b>Неправильно!</b>\n\n💡 <b>Правильный ответ:</b> {question_data['options'][int(correct_answer)-1]}"
+                            result_emoji = "❌"
+                            result_text = f"Неправильно!\n\n💡 Правильный ответ: {question_data['options'][int(correct_answer)-1]}"
 
                         # Обновляем сессию
                         quiz_session['current_question'] += 1
@@ -628,12 +630,50 @@ class AIBot:
 
                         # Показываем результат и переходим к следующему вопросу или завершаем
                         if quiz_session['current_question'] >= quiz_session['total_questions']:
-                            # Викторина завершена
-                            await self._finish_quiz(callback, quiz_session)
+                            # Викторина завершена - показываем финальные результаты
+                            total_questions = quiz_session['total_questions']
+                            correct_answers = quiz_session['correct_answers']
+                            percentage = (correct_answers / total_questions * 100) if total_questions > 0 else 0
+
+                            # Определяем оценку
+                            if percentage >= 90:
+                                grade = "Отлично! Ты эксперт! 🏆"
+                            elif percentage >= 75:
+                                grade = "Хорошо! Продолжай в том же духе! 👏"
+                            elif percentage >= 50:
+                                grade = "Неплохо! Можно лучше! 💪"
+                            else:
+                                grade = "Нужно подучить материал! 📚"
+
+                            final_text = f"🏁 <b>Викторина завершена!</b>\n\n" \
+                                       f"📊 <b>Результаты:</b>\n" \
+                                       f"✅ Правильных ответов: <b>{correct_answers}/{total_questions}</b>\n" \
+                                       f"📈 Процент правильных: <b>{percentage:.1f}%</b>\n\n" \
+                                       f"🎉 <b>{grade}</b>\n\n" \
+                                       f"🎮 Хочешь сыграть еще раз?"
+
+                            await self._safe_edit_message(callback, final_text, keyboard_manager.get_menu_button())
+
+                            # Очищаем викторину
+                            memory_manager.clear_user_active_game(user_id)
+
+                            # Логируем статистику
+                            try:
+                                self.db.update_user_stats(user_id, "total_quiz_games")
+                            except Exception as e:
+                                log_error(f"Ошибка логирования викторины пользователя {user_id}: {str(e)}")
                         else:
-                            # Показываем следующий вопрос через небольшую задержку
-                            await callback.message.reply(result_text)
-                            await asyncio.sleep(1.5)  # Небольшая пауза для чтения результата
+                            # Показываем результат и генерируем следующий вопрос через задержку
+                            # Сначала показываем результат
+                            result_display_text = f"{result_emoji} <b>{result_text}</b>\n\n⏳ <i>Загружаем следующий вопрос...</i>"
+
+                            # Обновляем сообщение с результатом
+                            await self._safe_edit_message(callback, result_display_text, None)
+
+                            # Небольшая задержка перед следующим вопросом
+                            await asyncio.sleep(1.0)
+
+                            # Показываем следующий вопрос
                             await self._show_next_quiz_question(callback)
                     else:
                         await callback.answer("❌ Ошибка: вопрос не найден")
