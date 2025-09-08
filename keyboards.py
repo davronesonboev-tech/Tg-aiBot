@@ -247,6 +247,18 @@ class KeyboardManager:
         return builder.as_markup()
 
     @staticmethod
+    def get_dice_game_menu() -> InlineKeyboardMarkup:
+        """Меню во время игры в кости."""
+        builder = InlineKeyboardBuilder()
+
+        builder.button(text="🔄 Начать заново", callback_data="dice_throw_again")
+        builder.button(text="⬅️ В меню", callback_data="menu_games")
+
+        builder.adjust(2)
+
+        return builder.as_markup()
+
+    @staticmethod
     def get_dice_waiting_menu() -> InlineKeyboardMarkup:
         """Меню ожидания броска кубика."""
         builder = InlineKeyboardBuilder()
