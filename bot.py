@@ -381,26 +381,23 @@ class AIBot:
         if len(args) > 1:
             bet = args[1].lower()
 
-        if bet not in ['low', 'medium', 'high', 'низкий', 'средний', 'высокий']:
+        # Проверяем доступные ставки
+        available_bets = ['low', 'medium', 'high', 'ultra', 'legendary', 'низкий', 'средний', 'высокий', 'ультра', 'легендарная', 'легендарный']
+        if bet not in available_bets:
+            bet_options = "🎯 Низкая (1-6)\n🎲 Средняя (7-12)\n💎 Высокая (13-18)\n⚡ Ультра (19-24)\n👑 Легендарная (25-30)"
             await message.reply("🎲 <b>Игра в кости</b>\n\n"
-                              "Использование: /dice <ставка>\n"
-                              "Ставки: low/низкий, medium/средний, high/высокий\n\n"
+                              "Использование: /dice <ставка>\n\n"
+                              f"<b>Доступные ставки:</b>\n{bet_options}\n\n"
                               "Примеры:\n"
                               "• /dice\n"
                               "• /кости средний\n"
-                              "• /dice high")
+                              "• /dice ultra\n\n"
+                              "💡 Или используй кнопки в меню '🎮 Игры'!",
+                              reply_markup=keyboard_manager.get_menu_button())
             return
 
-        # Преобразуем русские слова в английские
-        if bet == 'низкий':
-            bet = 'low'
-        elif bet == 'средний':
-            bet = 'medium'
-        elif bet == 'высокий':
-            bet = 'high'
-
-        result = game_service.play_dice_game(bet)
-        await message.reply(result)
+        result_text, game_data = game_service.play_dice_game(bet, user_id)
+        await message.reply(result_text, reply_markup=keyboard_manager.get_menu_button())
         log_info(f"Игра в кости со ставкой {bet}", user_id)
 
     async def cmd_game_quiz(self, message: types.Message):
@@ -629,19 +626,138 @@ class AIBot:
                 await self._safe_edit_message(callback, history_text, keyboard_manager.get_rps_history_menu())
 
             elif callback_data == "game_dice":
-                new_text = "🎲 <b>Игра в кости</b>\n\nВыбери ставку:"
+                new_text = "🎲 <b>Игра в кости</b>\n\nВыбери уровень ставки:"
                 await self._safe_edit_message(callback, new_text, keyboard_manager.get_dice_bet_menu())
 
             elif callback_data.startswith("dice_"):
                 bet = callback_data.split("_", 1)[1]
+                user_id = callback.from_user.id
 
-                # Преобразование английских названий в русские для совместимости
-                bet_map = {"low": "low", "medium": "medium", "high": "high"}
+                # Преобразование английских названий
+                bet_map = {
+                    "low": "low", "medium": "medium", "high": "high",
+                    "ultra": "ultra", "legendary": "legendary"
+                }
                 bet = bet_map.get(bet, bet)
 
-                result = game_service.play_dice_game(bet)
-                result_text = f"🎯 <b>Результат игры в кости:</b>\n\n{result}"
-                await self._safe_edit_message(callback, result_text, keyboard_manager.get_games_menu())
+                result_text, game_data = game_service.play_dice_game(bet, user_id)
+
+                # Создаем расширенное меню с историей и статистикой
+                dice_menu = keyboard_manager.get_games_menu()
+
+                # Добавляем кнопки для истории и статистики
+                from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+                if isinstance(dice_menu, InlineKeyboardMarkup):
+                    # Копируем существующие кнопки
+                    buttons = []
+                    for row in dice_menu.inline_keyboard:
+                        buttons.extend(row)
+
+                    # Добавляем новые кнопки
+                    buttons.append(InlineKeyboardButton(text="📊 Статистика костей", callback_data="dice_stats"))
+                    buttons.append(InlineKeyboardButton(text="📚 История костей", callback_data="dice_history"))
+
+                    # Перестраиваем клавиатуру
+                    new_keyboard = []
+                    for i in range(0, len(buttons), 2):
+                        new_keyboard.append(buttons[i:i+2])
+
+                    dice_menu = InlineKeyboardMarkup(inline_keyboard=new_keyboard)
+
+                game_result_text = f"🎯 <b>Результат игры в кости:</b>\n\n{result_text}"
+                await self._safe_edit_message(callback, game_result_text, dice_menu)
+
+                # Логируем статистику в БД
+                try:
+                    self.db.log_message(user_id, "game_dice", content=bet, response=result_text)
+                    self.db.update_user_stats(user_id, "total_rps_games")  # Используем существующее поле
+                except Exception as e:
+                    log_error(f"Ошибка логирования игры в кости пользователя {user_id}: {str(e)}")
+
+            elif callback_data == "dice_stats":
+                # Показываем статистику игр в кости
+                stats = game_service.get_dice_stats(user_id)
+
+                if stats['total_games'] == 0:
+                    stats_text = "📊 <b>Статистика игр в кости</b>\n\n" \
+                               "🎲 Ты еще не играл в кости!\n" \
+                               "🪨 Начни игру, чтобы увидеть статистику."
+                else:
+                    # Эмодзи для результатов
+                    trophy = "🏆" if stats['win_rate'] >= 60 else "🎯" if stats['win_rate'] >= 40 else "💪"
+
+                    stats_text = f"📊 <b>Статистика игр в кости</b>\n\n" \
+                               f"🎲 <b>Всего игр:</b> {stats['total_games']}\n" \
+                               f"🏆 <b>Побед:</b> {stats['user_wins']}\n" \
+                               f"😢 <b>Поражений:</b> {stats['bot_wins']}\n" \
+                               f"🤝 <b>Ничьих:</b> {stats['draws']}\n" \
+                               f"{trophy} <b>Процент побед:</b> {stats['win_rate']}%\n\n" \
+                               f"📈 <b>Средний бросок:</b>\n" \
+                               f"🎯 Ты: {stats['user_avg_dice']}\n" \
+                               f"🤖 Бот: {stats['bot_avg_dice']}\n\n"
+
+                    # Добавляем статистику по ставкам
+                    if stats['bet_stats']:
+                        stats_text += "<b>Статистика по ставкам:</b>\n"
+                        bet_names = {
+                            'low': '🎯 Низкая',
+                            'medium': '🎲 Средняя',
+                            'high': '💎 Высокая',
+                            'ultra': '⚡ Ультра',
+                            'legendary': '👑 Легендарная'
+                        }
+                        for bet_level, bet_data in sorted(stats['bet_stats'].items(), key=lambda x: x[1]['games'], reverse=True):
+                            bet_name = bet_names.get(bet_level, bet_level)
+                            win_rate = (bet_data['wins'] / bet_data['games'] * 100) if bet_data['games'] > 0 else 0
+                            stats_text += f"{bet_name}: {bet_data['games']} игр, {win_rate:.1f}% побед\n"
+
+                await self._safe_edit_message(callback, stats_text, keyboard_manager.get_dice_stats_menu())
+
+            elif callback_data == "dice_history":
+                # Показываем историю последних игр в кости
+                history = game_service.get_dice_history(user_id, limit=10)
+
+                if not history:
+                    history_text = "📚 <b>История игр в кости</b>\n\n" \
+                                 "🎲 Ты еще не играл в кости!\n" \
+                                 "🪨 Начни игру, чтобы создать историю."
+                else:
+                    history_text = f"📚 <b>Последние {len(history)} игр в кости</b>\n\n"
+
+                    for i, game in enumerate(history, 1):
+                        # Эмодзи для ставки
+                        bet_emojis = {
+                            'low': '🎯',
+                            'medium': '🎲',
+                            'high': '💎',
+                            'ultra': '⚡',
+                            'legendary': '👑'
+                        }
+                        bet_emoji = bet_emojis.get(game['bet_level'], '🎲')
+
+                        # Эмодзи для результата
+                        result_emoji = {
+                            'user_win': '🏆',
+                            'bot_win': '😢',
+                            'draw': '🤝'
+                        }.get(game['result'], '❓')
+
+                        # Форматируем время
+                        timestamp = ""
+                        if game.get('timestamp'):
+                            try:
+                                from datetime import datetime
+                                dt = datetime.fromisoformat(game['timestamp'].replace('Z', '+00:00'))
+                                timestamp = dt.strftime("%H:%M")
+                            except:
+                                pass
+
+                        history_text += f"{i}. {bet_emoji} {game['user_dice']} vs {game['bot_dice']} {result_emoji}"
+                        if timestamp:
+                            history_text += f" ({timestamp})"
+                        history_text += "\n"
+
+                await self._safe_edit_message(callback, history_text, keyboard_manager.get_dice_history_menu())
 
             elif callback_data == "game_guess":
                 new_text = "🔢 <b>Угадай число</b>\n\nВыбери сложность:"
