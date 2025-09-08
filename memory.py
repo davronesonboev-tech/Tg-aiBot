@@ -240,6 +240,12 @@ class MemoryManager:
                 if 'last_updated' in memory_data['metadata']:
                     memory_data['metadata']['last_updated'] = memory_data['metadata']['last_updated'].isoformat()
 
+                # Преобразуем даты в game_state
+                if 'game_state' in memory_data['metadata'] and memory_data['metadata']['game_state']:
+                    game_state = memory_data['metadata']['game_state']
+                    if 'last_game_time' in game_state and game_state['last_game_time']:
+                        game_state['last_game_time'] = game_state['last_game_time'].isoformat()
+
                 data[str(user_id)] = memory_data
 
             with open(self.storage_file, 'w', encoding='utf-8') as f:
