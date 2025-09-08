@@ -10,6 +10,7 @@ from typing import Optional, Tuple
 from aiogram import Bot, Dispatcher, types
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.filters import Command
 # ContentTypesFilter не нужен, используем lambda
 
@@ -448,7 +449,6 @@ class AIBot:
                     memory_manager.clear_user_active_game(user_id)
 
                     # Показываем результат
-                    from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
                     continue_menu = InlineKeyboardMarkup(inline_keyboard=[
                         [InlineKeyboardButton(text="🎲 Сыграть еще", callback_data="dice_throw_again")],
                         [InlineKeyboardButton(text="📊 Статистика", callback_data="dice_stats")],
@@ -507,7 +507,6 @@ class AIBot:
         memory_manager.clear_user_active_game(user_id)
 
         # Показываем результат
-        from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
         continue_menu = InlineKeyboardMarkup(inline_keyboard=[
             [InlineKeyboardButton(text="🎲 Сыграть еще", callback_data="dice_throw_again")],
             [InlineKeyboardButton(text="📊 Статистика", callback_data="dice_stats")],
@@ -554,7 +553,6 @@ class AIBot:
                          "Отправь эмодзи 🎲 в чат:"
 
             # Создаем клавиатуру для пользователя
-            from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
             user_throw_keyboard = InlineKeyboardMarkup(inline_keyboard=[
                 [InlineKeyboardButton(text="🎲 Готов бросить!", callback_data=f"dice_user_throw_{bot_dice_value}")],
                 [InlineKeyboardButton(text="🔄 Новая игра", callback_data="game_dice")],
@@ -597,7 +595,6 @@ class AIBot:
                      "🎯 <b>Теперь брось настоящий кубик!</b>\n" \
                      "Отправь эмодзи 🎲 в чат:"
 
-        from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
         user_throw_keyboard = InlineKeyboardMarkup(inline_keyboard=[
             [InlineKeyboardButton(text="🎲 Готов бросить!", callback_data=f"dice_user_throw_{bot_dice}")],
             [InlineKeyboardButton(text="🔄 Новая игра", callback_data="game_dice")],
@@ -736,7 +733,6 @@ class AIBot:
                 rps_menu = keyboard_manager.get_rps_choice_menu()
 
                 # Добавляем кнопки для истории и статистики
-                from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
                 if isinstance(rps_menu, InlineKeyboardMarkup):
                     # Копируем существующие кнопки
                     buttons = []
@@ -927,7 +923,6 @@ class AIBot:
                     memory_manager.clear_user_active_game(user_id)
 
                     # Показываем финальный результат
-                    from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
                     continue_menu = InlineKeyboardMarkup(inline_keyboard=[
                         [InlineKeyboardButton(text="🎲 Сыграть еще", callback_data="dice_throw_again")],
                         [InlineKeyboardButton(text="📊 Статистика", callback_data="dice_stats")],
@@ -984,7 +979,6 @@ class AIBot:
                 dice_menu = keyboard_manager.get_games_menu()
 
                 # Добавляем кнопки для истории и статистики
-                from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
                 if isinstance(dice_menu, InlineKeyboardMarkup):
                     # Копируем существующие кнопки
                     buttons = []
@@ -2062,7 +2056,6 @@ class AIBot:
                     memory_manager.clear_user_active_game(user_id)
 
                     # Показываем результат и меню для продолжения
-                    from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
                     continue_menu = InlineKeyboardMarkup(inline_keyboard=[
                         [InlineKeyboardButton(text="🪨 Сыграть еще", callback_data="game_rps")],
                         [InlineKeyboardButton(text="📊 Статистика", callback_data="rps_stats")],
