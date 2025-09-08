@@ -328,11 +328,22 @@ class GameService:
         Игра камень-ножницы-бумага.
 
         Args:
-            user_choice: Выбор пользователя (камень/ножницы/бумага)
+            user_choice: Выбор пользователя (rock/scissors/paper или камень/ножницы/бумага)
 
         Returns:
             str: Результат игры
         """
+        # Преобразование английских названий в русские
+        choice_map = {
+            'rock': 'камень',
+            'scissors': 'ножницы',
+            'paper': 'бумага'
+        }
+
+        # Если передан английский вариант, преобразуем
+        if user_choice.lower() in choice_map:
+            user_choice = choice_map[user_choice.lower()]
+
         choices = ['камень', 'ножницы', 'бумага']
         user_choice = user_choice.lower().strip()
 
