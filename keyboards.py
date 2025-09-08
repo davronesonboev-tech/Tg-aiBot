@@ -2,6 +2,7 @@
 Модуль для создания интерактивных клавиатур (кнопок) в Telegram боте.
 """
 
+from typing import List
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from personas import persona_manager, PersonaType
@@ -96,6 +97,24 @@ class KeyboardManager:
         builder.button(text="⬅️ Назад в игры", callback_data="menu_games")
 
         builder.adjust(3, 1)
+        return builder.as_markup()
+
+    @staticmethod
+    def get_quiz_answers_menu(options: List[str]) -> InlineKeyboardMarkup:
+        """Клавиатура с вариантами ответов викторины."""
+        builder = InlineKeyboardBuilder()
+
+        # Добавляем варианты ответов как кнопки
+        for i, option in enumerate(options):
+            # Обрезаем длинные варианты, чтобы поместились на кнопку
+            button_text = option[:30] + "..." if len(option) > 30 else option
+            builder.button(text=button_text, callback_data=f"quiz_answer_{i+1}")
+
+        builder.button(text="💡 Подсказка", callback_data="quiz_hint")
+        builder.button(text="⬅️ Назад в игры", callback_data="menu_games")
+
+        builder.adjust(1, 1, 1, 1, 1, 2)  # 4 варианта + подсказка + назад
+
         return builder.as_markup()
 
     @staticmethod
