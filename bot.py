@@ -1237,6 +1237,8 @@ class AIBot:
                                 self.db.update_user_stats(user_id, "total_games")
                             except Exception as e:
                                 log_error(f"Ошибка логирования угадай числа пользователя {user_id}: {str(e)}")
+
+                            return True  # Завершаем обработку игры
                         else:
                             await message.reply(f"🎯 {result}", reply_markup=keyboard_manager.get_menu_button())
                             return True  # Важно вернуть True, чтобы игра продолжилась
@@ -1261,6 +1263,8 @@ class AIBot:
                                 self.db.update_user_stats(user_id, "total_quiz_games")
                             except Exception as e:
                                 log_error(f"Ошибка логирования викторины пользователя {user_id}: {str(e)}")
+
+                            return True  # Завершаем обработку викторины
                         else:
                             # Для викторины с кнопками - показываем подсказку и даем выбрать другой ответ
                             game_data = memory_manager.get_user_game_data(user_id)
