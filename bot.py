@@ -623,7 +623,7 @@ class AIBot:
 
                         # Обновляем сессию
                         quiz_session['current_question'] += 1
-                        memory_manager.update_user_game_data(user_id, quiz_session)
+                        memory_manager.update_user_game_data(user_id, "quiz_active", quiz_session)
 
                         # Показываем результат и переходим к следующему вопросу или завершаем
                         if quiz_session['current_question'] >= quiz_session['total_questions']:
@@ -707,7 +707,7 @@ class AIBot:
 
                 if game_data:
                     game_data['industry'] = industry
-                    memory_manager.update_user_game_data(user_id, game_data)
+                    memory_manager.update_user_game_data(user_id, "quiz_setup", game_data)
 
                     industry_names = {
                         'биология': '🧬 Биология',
@@ -758,7 +758,7 @@ class AIBot:
 
                 if game_data:
                     game_data['question_count'] = count
-                    memory_manager.update_user_game_data(user_id, game_data)
+                    memory_manager.update_user_game_data(user_id, "quiz_setup", game_data)
 
                     settings_text = f"✅ <b>Количество вопросов:</b> {count}\n\n" \
                                    "🎯 Выберите остальные параметры или начните игру!"
@@ -1465,10 +1465,6 @@ class AIBot:
                         log_error(f"Ошибка перевода текста на {target_lang}: {text}", user_id)
                     return True
 
-        except Exception as e:
-            log_error(f"Ошибка при обработке ответа на игру {active_game}: {str(e)}", user_id)
-            await message.reply("❌ Произошла ошибка. Попробуй начать заново!")
-
             elif active_game == "quiz_custom_count":
                 # Обработка пользовательского количества вопросов
                 if len(text.strip()) > 0:
@@ -1478,7 +1474,7 @@ class AIBot:
                             game_data = memory_manager.get_user_game_data(user_id)
                             if game_data:
                                 game_data['question_count'] = count
-                                memory_manager.update_user_game_data(user_id, game_data)
+                                memory_manager.update_user_game_data(user_id, "quiz_setup", game_data)
 
                             settings_text = f"✅ <b>Количество вопросов:</b> {count}\n\n🎯 Теперь нажми '🎮 Начать викторину'!"
                             await message.reply(settings_text, reply_markup=keyboard_manager.get_quiz_settings_menu())
@@ -1490,6 +1486,10 @@ class AIBot:
                     except ValueError:
                         await message.reply("❌ Введите число от 1 до 50!")
                 return True
+
+        except Exception as e:
+            log_error(f"Ошибка при обработке ответа на игру {active_game}: {str(e)}", user_id)
+            await message.reply("❌ Произошла ошибка. Попробуй начать заново!")
 
         return False
 
@@ -1880,7 +1880,7 @@ class AIBot:
 
             if quiz_data:
                 quiz_session['questions'].append(quiz_data)
-                memory_manager.update_user_game_data(user_id, quiz_session)
+                memory_manager.update_user_game_data(user_id, "quiz_active", quiz_session)
             else:
                 await callback.message.reply("❌ Не удалось сгенерировать вопрос викторины")
                 return
@@ -1895,7 +1895,7 @@ class AIBot:
 
         # Обновляем время начала вопроса
         quiz_session['question_start_time'] = datetime.now()
-        memory_manager.update_user_game_data(user_id, quiz_session)
+        memory_manager.update_user_game_data(user_id, "quiz_active", quiz_session)
 
         await self._safe_edit_message(callback, progress_text, keyboard_manager.get_quiz_answers_menu(question_data['options']))
 
