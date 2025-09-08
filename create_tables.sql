@@ -3,8 +3,10 @@
 -- Версия: 1.2 | Дата: 2025-09-08
 
 -- ДОПОЛНИТЕЛЬНЫЕ КОМАНДЫ ДЛЯ ОБНОВЛЕНИЯ СУЩЕСТВУЮЩЕЙ БАЗЫ:
--- ALTER TABLE users ADD COLUMN IF NOT EXISTS total_rps_games INTEGER DEFAULT 0;
--- ALTER TABLE users ADD COLUMN IF NOT EXISTS total_quiz_games INTEGER DEFAULT 0;
+-- Выполните эти команды в Railway Database -> Query ПЕРЕД созданием таблиц
+ALTER TABLE users ADD COLUMN IF NOT EXISTS total_rps_games INTEGER DEFAULT 0;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS total_quiz_games INTEGER DEFAULT 0;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS total_weather_requests INTEGER DEFAULT 0;
 
 -- Создание таблицы пользователей
 CREATE TABLE IF NOT EXISTS users (
