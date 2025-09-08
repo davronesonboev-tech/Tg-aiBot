@@ -639,19 +639,19 @@ class AIBot:
                 game_data = memory_manager.get_user_game_data(user_id)
 
                 if game_data and 'hint' in game_data and 'question' in game_data:
-                    # Получаем текущее сообщение и добавляем подсказку
-                    current_text = callback.message.text or ""
                     question = game_data['question']
                     hint = game_data['hint']
+                    options = game_data.get('options', [])
 
                     # Создаем новый текст с подсказкой
                     hint_text = f"🧠 <b>Викторина:</b>\n\n❓ {question}\n\n💡 <b>Подсказка:</b> {hint}\n\n🎯 <b>Выбери правильный ответ:</b>"
 
-                    options = game_data.get('options', [])
-                    if options:
+                    # Проверяем, отличается ли новый текст от текущего
+                    current_text = callback.message.text or ""
+                    if current_text != hint_text and options:
                         await self._safe_edit_message(callback, hint_text, keyboard_manager.get_quiz_answers_menu(options))
                     else:
-                        await callback.answer("❌ Ошибка загрузки вариантов ответов")
+                        await callback.answer("💡 Подсказка уже показана!")
                 else:
                     await callback.answer("❌ Подсказка недоступна")
 
