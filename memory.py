@@ -203,6 +203,11 @@ class MemoryManager:
                     if 'last_game_time' in memory.metadata['game_state'] and isinstance(memory.metadata['game_state']['last_game_time'], str):
                         memory.metadata['game_state']['last_game_time'] = datetime.fromisoformat(memory.metadata['game_state']['last_game_time'])
 
+                    # Конвертируем datetime в game_data
+                    if 'game_data' in memory.metadata['game_state'] and memory.metadata['game_state']['game_data']:
+                        game_data = memory.metadata['game_state']['game_data']
+                        self._convert_strings_to_datetime(game_data)
+
                     self.memories[user_id] = memory
 
                 log_info(f"Загружены воспоминания для {len(self.memories)} пользователей")
@@ -243,8 +248,15 @@ class MemoryManager:
                 # Преобразуем даты в game_state
                 if 'game_state' in memory_data['metadata'] and memory_data['metadata']['game_state']:
                     game_state = memory_data['metadata']['game_state']
+
+                    # Обработка last_game_time
                     if 'last_game_time' in game_state and game_state['last_game_time'] and hasattr(game_state['last_game_time'], 'isoformat'):
                         game_state['last_game_time'] = game_state['last_game_time'].isoformat()
+
+                    # Обработка datetime в game_data
+                    if 'game_data' in game_state and game_state['game_data']:
+                        game_data = game_state['game_data']
+                        self._convert_datetime_in_dict(game_data)
 
                 data[str(user_id)] = memory_data
 
@@ -253,6 +265,71 @@ class MemoryManager:
 
         except Exception as e:
             log_error(f"Ошибка при сохранении воспоминаний: {str(e)}")
+
+    def _convert_datetime_in_dict(self, data: dict, _seen=None) -> None:
+        """Рекурсивно конвертирует datetime объекты в строки в словаре."""
+        if _seen is None:
+            _seen = set()
+
+        # Предотвращаем бесконечную рекурсию
+        data_id = id(data)
+        if data_id in _seen:
+            return
+        _seen.add(data_id)
+
+        try:
+            for key, value in list(data.items()):
+                if isinstance(value, dict):
+                    self._convert_datetime_in_dict(value, _seen)
+                elif hasattr(value, 'isoformat') and callable(getattr(value, 'isoformat', None)):
+                    data[key] = value.isoformat()
+                elif isinstance(value, list):
+                    for i, item in enumerate(value):
+                        if isinstance(item, dict):
+                            self._convert_datetime_in_dict(item, _seen)
+                        elif hasattr(item, 'isoformat') and callable(getattr(item, 'isoformat', None)):
+                            value[i] = item.isoformat()
+        finally:
+            _seen.discard(data_id)
+
+    def _convert_strings_to_datetime(self, data: dict, _seen=None) -> None:
+        """Рекурсивно конвертирует строки datetime обратно в объекты datetime."""
+        if _seen is None:
+            _seen = set()
+
+        # Предотвращаем бесконечную рекурсию
+        data_id = id(data)
+        if data_id in _seen:
+            return
+        _seen.add(data_id)
+
+        try:
+            for key, value in list(data.items()):
+                if isinstance(value, dict):
+                    self._convert_strings_to_datetime(value, _seen)
+                elif isinstance(value, str) and self._is_datetime_string(value):
+                    try:
+                        data[key] = datetime.fromisoformat(value)
+                    except (ValueError, TypeError):
+                        pass  # Не datetime строка, оставляем как есть
+                elif isinstance(value, list):
+                    for i, item in enumerate(value):
+                        if isinstance(item, dict):
+                            self._convert_strings_to_datetime(item, _seen)
+                        elif isinstance(item, str) and self._is_datetime_string(item):
+                            try:
+                                value[i] = datetime.fromisoformat(item)
+                            except (ValueError, TypeError):
+                                pass
+        finally:
+            _seen.discard(data_id)
+
+    def _is_datetime_string(self, s: str) -> bool:
+        """Проверяет, является ли строка datetime в формате ISO."""
+        if not isinstance(s, str):
+            return False
+        # Простая проверка на формат ISO datetime
+        return 'T' in s and ('-' in s or ':' in s) and len(s) >= 19
 
     def get_memory(self, user_id: int) -> ConversationMemory:
         """Получить или создать память для пользователя."""
