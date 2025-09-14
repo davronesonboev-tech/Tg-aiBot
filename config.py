@@ -21,7 +21,7 @@ class Config:
     GOOGLE_API_KEY: Optional[str] = os.getenv("GOOGLE_API_KEY")
 
     # Модель Gemini для использования
-    GEMINI_MODEL: str = os.getenv("GEMINI_MODEL", "models/gemini-2.5-pro")
+    GEMINI_MODEL: str = os.getenv("GEMINI_MODEL", "models/gemini-1.5-pro")
 
     # PostgreSQL Database URL
     DATABASE_URL: Optional[str] = os.getenv("DATABASE_URL")
