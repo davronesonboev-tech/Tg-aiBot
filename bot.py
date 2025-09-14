@@ -1,32 +1,36 @@
 """
-Основной модуль Telegram бота с ИИ.
-Обрабатывает текстовые сообщения, изображения и голосовые сообщения.
+Улучшенный Telegram бот с ИИ на базе Gemini 2.5 Pro.
+Поддерживает естественное общение без команд, умные игры,
+мультимодальность и продвинутые возможности ИИ.
 """
 
 import asyncio
-import random
+import time
+import re
+from typing import Optional, Dict, Any, List, Tuple
 from datetime import datetime
-from typing import Optional, Tuple
 
 from aiogram import Bot, Dispatcher, types
+from aiogram.enums import ParseMode, ChatAction
 from aiogram.client.default import DefaultBotProperties
-from aiogram.enums import ParseMode
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.filters import Command
-# ContentTypesFilter не нужен, используем lambda
+from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
 
 from config import config
-from logger import log_info, log_error, log_warning
-from gemini_client import gemini_client
-from personas import persona_manager, PersonaType
-from utils import calculator, translator, weather_service, game_service, fun_service
-from memory import memory_manager
-from keyboards import keyboard_manager
+from logger import logger, log_info, log_error, log_warning
 from database import get_db_manager
+from memory import memory_manager
+from personas import persona_manager, PersonaType
+from gemini_client import gemini_client
+from utils import (
+    Calculator, Translator, WeatherService, GameService, 
+    FunService, SmartDetector, AdvancedTools
+)
+from keyboards import keyboard_manager
 
 
-class AIBot:
-    """Основной класс Telegram бота с ИИ."""
+class EnhancedAIBot:
+    """Улучшенный Telegram бот с ИИ и естественным взаимодействием."""
 
     def __init__(self):
         """Инициализирует бота."""
@@ -36,89 +40,45 @@ class AIBot:
         )
         self.dp = Dispatcher()
         self.db = get_db_manager()
-
+        
+        self.calculator = Calculator()
+        self.translator = Translator()
+        self.weather = WeatherService()
+        self.games = GameService()
+        self.fun = FunService()
+        self.detector = SmartDetector()
+        self.tools = AdvancedTools()
+        
+        self.response_cache = {}
+        self.cache_ttl = 300  # 5 minutes
+        
         # Регистрируем обработчики
         self._register_handlers()
 
     def _register_handlers(self):
         """Регистрирует все обработчики сообщений."""
-        # Обработчик команды /start
         self.dp.message.register(self.cmd_start, Command("start"))
-
-        # Обработчик команды /help
         self.dp.message.register(self.cmd_help, Command("help"))
-
-        # Команды смены режимов
-        self.dp.message.register(self.cmd_friendly, Command("friendly"))
-        self.dp.message.register(self.cmd_friendly, Command("дружелюбный"))
-        self.dp.message.register(self.cmd_programmer, Command("programmer"))
-        self.dp.message.register(self.cmd_programmer, Command("программист"))
-        self.dp.message.register(self.cmd_programmer, Command("code"))
-        self.dp.message.register(self.cmd_programmer, Command("код"))
-        self.dp.message.register(self.cmd_expert, Command("expert"))
-        self.dp.message.register(self.cmd_expert, Command("эксперт"))
-        self.dp.message.register(self.cmd_creative, Command("creative"))
-        self.dp.message.register(self.cmd_creative, Command("креатив"))
-        self.dp.message.register(self.cmd_creative, Command("идеи"))
-        self.dp.message.register(self.cmd_professional, Command("professional"))
-        self.dp.message.register(self.cmd_professional, Command("профессионал"))
-        self.dp.message.register(self.cmd_professional, Command("бизнес"))
-        self.dp.message.register(self.cmd_current_mode, Command("mode"))
-        self.dp.message.register(self.cmd_current_mode, Command("режим"))
-
-        # Команды дополнительных функций
-        self.dp.message.register(self.cmd_calculate, Command("calc"))
-        self.dp.message.register(self.cmd_calculate, Command("калькулятор"))
-        self.dp.message.register(self.cmd_calculate, Command("calculate"))
-        self.dp.message.register(self.cmd_game_rps, Command("rps"))
-        self.dp.message.register(self.cmd_game_rps, Command("камень"))
-        self.dp.message.register(self.cmd_game_guess, Command("guess"))
-        self.dp.message.register(self.cmd_game_guess, Command("угадай"))
-        self.dp.message.register(self.cmd_fun_fact, Command("fact"))
-        self.dp.message.register(self.cmd_fun_fact, Command("факт"))
-        self.dp.message.register(self.cmd_fun_quote, Command("quote"))
-        self.dp.message.register(self.cmd_fun_quote, Command("цитата"))
-        self.dp.message.register(self.cmd_fun_joke, Command("joke"))
-        self.dp.message.register(self.cmd_fun_joke, Command("шутка"))
-
-        # Новые игры и развлечения
-        self.dp.message.register(self.cmd_game_dice, Command("dice"))
-        self.dp.message.register(self.cmd_game_dice, Command("кости"))
-        self.dp.message.register(self.handle_dice_message, lambda message: message.dice is not None)
-        self.dp.message.register(self.cmd_game_quiz, Command("quiz"))
-        self.dp.message.register(self.cmd_game_quiz, Command("викторина"))
-        self.dp.message.register(self.cmd_magic_ball, Command("ball"))
-        self.dp.message.register(self.cmd_magic_ball, Command("шар"))
-        self.dp.message.register(self.cmd_magic_ball, Command("волшебный"))
-        self.dp.message.register(self.cmd_memory_clear, Command("clear"))
-        self.dp.message.register(self.cmd_memory_clear, Command("очистить"))
-        self.dp.message.register(self.cmd_memory_stats, Command("stats"))
-        self.dp.message.register(self.cmd_memory_stats, Command("статистика"))
-
-        # Добавляем команду для меню
         self.dp.message.register(self.show_main_menu, Command("menu"))
+        self.dp.message.register(self.cmd_memory_clear, Command("clear"))
+        self.dp.message.register(self.cmd_memory_stats, Command("stats"))
 
-        # Обработчик текстовых сообщений
         self.dp.message.register(self.handle_text_message, lambda msg: msg.text and not msg.text.startswith('/'))
-
-        # Обработчик изображений
         self.dp.message.register(self.handle_photo_message, lambda msg: msg.photo)
-
-        # Обработчик голосовых сообщений
         self.dp.message.register(self.handle_voice_message, lambda msg: msg.voice)
-
-        # Обработчик аудио файлов
         self.dp.message.register(self.handle_audio_message, lambda msg: msg.audio)
+        self.dp.message.register(self.handle_video_message, lambda msg: msg.video)
+        self.dp.message.register(self.handle_document_message, lambda msg: msg.document)
+        self.dp.message.register(self.handle_dice_message, lambda msg: msg.dice)
 
-        # Обработчик callback query для кнопок
+        # Callback handlers
         self.dp.callback_query.register(self.handle_callback)
 
-    async def cmd_start(self, message: types.Message):
+    async def cmd_start(self, message: Message):
         """Обработчик команды /start."""
         user_id = message.from_user.id
         log_info("Получена команда /start", user_id)
 
-        # Сохраняем/обновляем пользователя в БД
         try:
             user_data = {
                 'username': message.from_user.username,
@@ -128,6 +88,9 @@ class AIBot:
                 'is_premium': message.from_user.is_premium or False
             }
             self.db.get_or_create_user(user_id, **user_data)
+            
+            memory_manager.get_memory(user_id)
+            
         except Exception as e:
             log_error(f"Ошибка сохранения пользователя {user_id}: {str(e)}")
 
@@ -135,262 +98,513 @@ class AIBot:
         is_admin = user_id == config.ADMIN_USER_ID
 
         welcome_text = (
-            "🤖 <b>Привет! Я ИИ-бот, созданный Javohir Zokirjonov</b>\n\n"
-            f"🎭 <b>Текущий режим:</b> {current_persona.name}\n\n"
-            "🚀 <b>Что умею:</b>\n"
-            "💬 Разговоры с ИИ\n"
-            "🖼️ Анализ изображений\n"
-            "🎵 Распознавание речи\n"
-            "🎮 Игры и развлечения\n\n"
-            "🎯 <b>Просто пишите естественно!</b>\n"
-            "🧮 <i>5+3*2</i>\n"
-            "🌐 <i>Кнопки выбора языков в меню</i>\n"
-            "🧠 <i>интересный факт</i>\n\n"
-            "🌤️ <b>Погода по областям Узбекистана</b>\n"
-            "<i>В меню инструментов → Погода</i>"
+            "🚀 <b>Привет! Я продвинутый ИИ-бот на базе Gemini 2.5 Pro!</b>\n\n"
+            f"🎭 <b>Режим:</b> {current_persona.name}\n\n"
+            "✨ <b>Что нового:</b>\n"
+            "🧠 Умное понимание без команд\n"
+            "🖼️ Анализ любых изображений\n"
+            "🎵 Распознавание речи и аудио\n"
+            "🎮 Интерактивные игры\n"
+            "🌍 Реальная погода по Узбекистану\n"
+            "🔧 Продвинутые инструменты\n\n"
+            "💬 <b>Просто общайтесь естественно!</b>\n"
+            "• <i>Реши 15*7+23</i>\n"
+            "• <i>Переведи на английский: привет мир</i>\n"
+            "• <i>Расскажи интересный факт</i>\n"
+            "• <i>Давай поиграем в угадайку</i>\n"
+            "• <i>Какая погода в Ташкенте?</i>\n\n"
+            "🎯 <b>Никаких команд - только живое общение!</b>"
         )
 
-        # Отправляем приветствие с клавиатурой
         await message.reply(
             welcome_text,
             reply_markup=keyboard_manager.get_main_menu(is_admin)
         )
 
-    async def cmd_help(self, message: types.Message):
+    async def cmd_help(self, message: Message):
         """Обработчик команды /help."""
         user_id = message.from_user.id
         log_info("Получена команда /help", user_id)
 
-        current_persona = persona_manager.get_current_persona()
-        available_commands = persona_manager.get_available_commands()
-
         help_text = (
-            "📚 <b>Справка по использованию</b>\n\n"
-            f"🎭 <b>Текущий режим:</b> {current_persona.name}\n\n"
-            "<b>Основные функции:</b>\n"
-            "💬 Отправьте текст - получите умный ответ\n"
-            "🖼️ Отправьте фото - анализ изображения\n"
-            "🎵 Отправьте голосовое - распознавание речи\n\n"
-            "<b>🎯 Естественный язык (ПРОСТО ПИШИТЕ!):</b>\n"
-            "🧮 <i>2+2*5</i> - калькулятор\n"
-            "🌐 <i>Кнопки выбора языков в меню</i> - перевод\n"
-            "🧠 <i>интересный факт</i> - факты, шутки, цитаты\n\n"
-            "<b>🌤️ Погода по областям Узбекистана:</b>\n"
-            "• Кнопки в меню инструментов\n"
-            "• 12 областей + Ташкент\n\n"
-            "<b>Игры без команд:</b>\n"
-            "🔢 Просто пиши числа в 'Угадай число'\n"
-            "🧠 Пиши номера в 'Викторине'\n"
-            "🪨 Пиши 'камень', 'ножницы', 'бумага'\n"
-            "❓ Задавай вопросы 'Волшебному шару'\n\n"
-            "<b>Режимы общения:</b>\n"
-        )
-
-        for cmd, desc in available_commands.items():
-            help_text += f"{cmd} - {desc}\n"
-
-        help_text += (
-            "\n<b>Команды (если нужно):</b>\n"
-            "/start - главное меню\n"
-            "/help - эта справка\n"
-            "/clear - очистить память\n\n"
-            "🎯 <b>Главное:</b> Просто пишите естественно!\n"
-            "Бот сам поймет что вы хотите:\n"
-            "• Математика → калькулятор\n"
-            "• Погода → прогноз\n"
-            "• Перевод → переводчик\n"
-            "• Факт/шутка → развлечения\n\n"
-            "🚀 <b>Наслаждайтесь общением!</b>\n\n"
-            "🤖 <i>Создан Javohir Zokirjonov</i>"
+            "📖 <b>Как пользоваться ботом</b>\n\n"
+            "🎯 <b>Главное правило: просто говорите естественно!</b>\n\n"
+            "🧮 <b>Математика:</b>\n"
+            "• <i>2+2*5</i>\n"
+            "• <i>Вычисли корень из 144</i>\n"
+            "• <i>Реши уравнение x²+5x+6=0</i>\n\n"
+            "🌐 <b>Переводы:</b>\n"
+            "• <i>Переведи на английский: как дела?</i>\n"
+            "• <i>Translate to Russian: hello world</i>\n\n"
+            "🌤️ <b>Погода:</b>\n"
+            "• <i>Погода в Ташкенте</i>\n"
+            "• <i>Какая температура в Самарканде?</i>\n\n"
+            "🎮 <b>Игры:</b>\n"
+            "• <i>Давай поиграем</i>\n"
+            "• <i>Загадай число</i>\n"
+            "• <i>Камень ножницы бумага</i>\n\n"
+            "🧠 <b>Развлечения:</b>\n"
+            "• <i>Расскажи факт</i>\n"
+            "• <i>Анекдот</i>\n"
+            "• <i>Мудрая цитата</i>\n\n"
+            "🎭 <b>Режимы общения:</b>\n"
+            "• Дружелюбный 🤗\n"
+            "• Программист 💻\n"
+            "• Эксперт 🎓\n"
+            "• Креативный 🎨\n"
+            "• Профессиональный 💼\n\n"
+            "📱 <b>Мультимедиа:</b>\n"
+            "• Отправьте фото - получите анализ\n"
+            "• Отправьте голосовое - получите текст\n"
+            "• Отправьте документ - получите обзор\n\n"
+            "🚀 <b>Просто общайтесь - я все пойму!</b>"
         )
 
         await message.reply(help_text)
 
-    async def cmd_friendly(self, message: types.Message):
-        """Переключение в дружелюбный режим."""
+    async def handle_text_message(self, message: Message):
+        """Улучшенный обработчик текстовых сообщений с умным распознаванием."""
         user_id = message.from_user.id
-        if persona_manager.set_persona(PersonaType.FRIENDLY):
-            current = persona_manager.get_current_persona()
-            log_info(f"Пользователь переключился в режим: {current.name}", user_id)
+        text = message.text.strip()
 
-            # Сохраняем выбранную персону в память пользователя
-            memory_manager.update_user_persona(user_id, current.name)
+        log_info(f"Получено сообщение: {text[:100]}...", user_id)
 
-            await message.reply(f"🤗 Переключен в режим: <b>{current.name}</b>\n\n{current.description}")
-        else:
-            await message.reply("❌ Не удалось переключить режим")
+        if self.db.is_user_banned(user_id):
+            await message.reply("❌ Вы временно заблокированы.")
+            return
 
-    async def cmd_programmer(self, message: types.Message):
-        """Переключение в режим программиста."""
-        user_id = message.from_user.id
-        if persona_manager.set_persona(PersonaType.PROGRAMMER):
-            current = persona_manager.get_current_persona()
-            log_info(f"Пользователь переключился в режим: {current.name}", user_id)
+        intent_result = await self._detect_and_handle_intent(user_id, text, message)
+        if intent_result:
+            return
 
-            # Сохраняем выбранную персону в память пользователя
-            memory_manager.update_user_persona(user_id, current.name)
+        if await self._handle_game_response(user_id, text, message):
+            return
 
-            await message.reply(f"💻 Переключен в режим: <b>{current.name}</b>\n\n{current.description}")
-        else:
-            await message.reply("❌ Не удалось переключить режим")
+        await self._generate_ai_response(user_id, text, message)
 
-    async def cmd_expert(self, message: types.Message):
-        """Переключение в экспертный режим."""
-        user_id = message.from_user.id
-        if persona_manager.set_persona(PersonaType.EXPERT):
-            current = persona_manager.get_current_persona()
-            log_info(f"Пользователь переключился в режим: {current.name}", user_id)
-            await message.reply(f"🎓 Переключен в режим: <b>{current.name}</b>\n\n{current.description}")
-        else:
-            await message.reply("❌ Не удалось переключить режим")
+    async def _detect_and_handle_intent(self, user_id: int, text: str, message: Message) -> bool:
+        """Умное определение намерений пользователя и их обработка."""
+        text_lower = text.lower()
+        
+        if self.detector.is_math_request(text):
+            await self._handle_math_request(user_id, text, message)
+            return True
+            
+        if self.detector.is_translation_request(text):
+            await self._handle_translation_request(user_id, text, message)
+            return True
+            
+        if self.detector.is_weather_request(text):
+            await self._handle_weather_request(user_id, text, message)
+            return True
+            
+        if self.detector.is_game_request(text):
+            await self._handle_game_request(user_id, text, message)
+            return True
+            
+        if self.detector.is_fun_request(text):
+            await self._handle_fun_request(user_id, text, message)
+            return True
+            
+        if self.detector.is_persona_change_request(text):
+            await self._handle_persona_change(user_id, text, message)
+            return True
+            
+        return False
 
-    async def cmd_creative(self, message: types.Message):
-        """Переключение в креативный режим."""
-        user_id = message.from_user.id
-        if persona_manager.set_persona(PersonaType.CREATIVE):
-            current = persona_manager.get_current_persona()
-            log_info(f"Пользователь переключился в режим: {current.name}", user_id)
-            await message.reply(f"🎨 Переключен в режим: <b>{current.name}</b>\n\n{current.description}")
-        else:
-            await message.reply("❌ Не удалось переключить режим")
-
-    async def cmd_professional(self, message: types.Message):
-        """Переключение в профессиональный режим."""
-        user_id = message.from_user.id
-        if persona_manager.set_persona(PersonaType.PROFESSIONAL):
-            current = persona_manager.get_current_persona()
-            log_info(f"Пользователь переключился в режим: {current.name}", user_id)
-            await message.reply(f"💼 Переключен в режим: <b>{current.name}</b>\n\n{current.description}")
-        else:
-            await message.reply("❌ Не удалось переключить режим")
-
-    async def cmd_current_mode(self, message: types.Message):
-        """Показать текущий режим."""
-        user_id = message.from_user.id
-        current = persona_manager.get_current_persona()
-        log_info(f"Пользователь запросил текущий режим: {current.name}", user_id)
-
-        mode_text = (
-            f"🎭 <b>Текущий режим:</b> {current.name}\n\n"
-            f"📝 {current.description}\n\n"
-            "💡 <i>Все мои ответы теперь будут в стиле этого режима!</i>"
+    async def _handle_math_request(self, user_id: int, text: str, message: Message):
+        """Обработка математических запросов."""
+        await message.bot.send_chat_action(message.chat.id, ChatAction.TYPING)
+        
+        try:
+            result = self.calculator.evaluate_expression(text)
+            if result is not None:
+                response = f"🧮 <b>Результат:</b> {result}"
+                await message.reply(response)
+                
+                # Update stats
+                self.db.update_user_stats(user_id, "total_calculations")
+                memory_manager.add_user_message(user_id, text, 'math')
+                memory_manager.add_assistant_message(user_id, response, 'math')
+                return
+                
+        except Exception as e:
+            log_error(f"Ошибка вычисления: {str(e)}")
+            
+        math_prompt = f"Реши математическую задачу пошагово: {text}"
+        context = memory_manager.get_user_context(user_id, limit=3)
+        
+        response = await gemini_client.generate_text_response_async(
+            math_prompt, context=context, task_type="math"
         )
-        await message.reply(mode_text)
-
-    async def cmd_calculate(self, message: types.Message):
-        """Калькулятор для математических выражений."""
-        user_id = message.from_user.id
-        args = message.text.split(' ', 1)
-
-        if len(args) < 2:
-            await message.reply("🧮 <b>Калькулятор</b>\n\n"
-                              "Использование: /calc <выражение>\n"
-                              "Примеры:\n"
-                              "• /calc 2 + 2\n"
-                              "• /calc 5 * (3 + 2)\n"
-                              "• /calc 10 / 3\n"
-                              "• /calc 2^8")
-            return
-
-        expression = args[1].strip()
-        result = calculator.evaluate_expression(expression)
-
-        if result is not None:
-            await message.reply(f"🧮 <b>Результат:</b>\n<code>{expression}</code> = <b>{result}</b>")
-            log_info(f"Вычислено выражение: {expression} = {result}", user_id)
+        
+        if response:
+            await message.reply(f"🧮 <b>Решение:</b>\n\n{response}")
+            self.db.update_user_stats(user_id, "total_calculations")
+            memory_manager.add_user_message(user_id, text, 'math')
+            memory_manager.add_assistant_message(user_id, response, 'math')
         else:
-            await message.reply("❌ Не удалось вычислить выражение. Проверьте синтаксис.")
-            log_error(f"Ошибка вычисления выражения: {expression}", user_id)
+            await message.reply("❌ Не удалось решить задачу. Попробуйте переформулировать.")
 
+    async def _handle_translation_request(self, user_id: int, text: str, message: Message):
+        """Обработка запросов на перевод."""
+        await message.bot.send_chat_action(message.chat.id, ChatAction.TYPING)
+        
+        try:
+            translation_prompt = f"""Переведи текст, определив исходный и целевой языки из контекста:
+            
+{text}
 
-    async def cmd_game_rps(self, message: types.Message):
-        """Игра камень-ножницы-бумага."""
-        user_id = message.from_user.id
-        args = message.text.split(' ', 1)
+Если не указан целевой язык:
+- Русский текст переводи на английский
+- Английский текст переводи на русский
+- Другие языки переводи на русский
 
-        if len(args) < 2:
-            await message.reply("🪨 <b>Камень-Ножницы-Бумага</b>\n\n"
-                              "Использование: /rps <выбор>\n"
-                              "Варианты: камень, ножницы, бумага\n\n"
-                              "Примеры:\n"
-                              "• /rps камень\n"
-                              "• /камень ножницы\n"
-                              "• /rps бумага\n\n"
-                              "💡 Или используй кнопки в меню '🎮 Игры'!",
-                              reply_markup=keyboard_manager.get_menu_button())
-            return
+Формат ответа:
+Перевод: [переведенный текст]
+Языки: [исходный] → [целевой]"""
 
-        user_choice = args[1].strip().lower()
-        result_text, game_data = game_service.play_rps(user_choice, user_id)
+            context = memory_manager.get_user_context(user_id, limit=2)
+            response = await gemini_client.generate_text_response_async(
+                translation_prompt, context=context, task_type="translation"
+            )
+            
+            if response:
+                await message.reply(f"🌐 <b>Перевод:</b>\n\n{response}")
+                self.db.update_user_stats(user_id, "total_translations")
+                memory_manager.add_user_message(user_id, text, 'translation')
+                memory_manager.add_assistant_message(user_id, response, 'translation')
+            else:
+                await message.reply("❌ Не удалось выполнить перевод.")
+                
+        except Exception as e:
+            log_error(f"Ошибка перевода: {str(e)}")
+            await message.reply("❌ Ошибка при переводе.")
 
-        await message.reply(result_text, reply_markup=keyboard_manager.get_menu_button())
-        log_info(f"Игра КНБ: пользователь выбрал {user_choice}", user_id)
+    async def _handle_weather_request(self, user_id: int, text: str, message: Message):
+        """Обработка запросов о погоде."""
+        await message.bot.send_chat_action(message.chat.id, ChatAction.TYPING)
+        
+        try:
+            city_prompt = f"""Извлеки название города из запроса о погоде: "{text}"
+            
+Верни только название города на русском языке в нижнем регистре.
+Если город не указан, верни "ташкент".
+Если указана область Узбекистана, верни главный город области.
 
-    async def cmd_game_guess(self, message: types.Message):
-        """Игра угадай число."""
-        user_id = message.from_user.id
-        args = message.text.split()
+Примеры:
+"погода в Самарканде" → самарканд
+"какая температура в Бухаре?" → бухара
+"погода" → ташкент"""
 
-        if len(args) == 1:
-            # Начинаем новую игру
-            message_text, target_number = game_service.guess_number_game()
-            # В реальном приложении нужно сохранить target_number для пользователя
-            await message.reply(f"{message_text}\n\nИспользуй: /guess <число>")
-            log_info("Начата игра угадай число", user_id)
+            city_response = await gemini_client.generate_text_response_async(
+                city_prompt, task_type="analysis"
+            )
+            
+            city = city_response.strip().lower() if city_response else "ташкент"
+            
+            # Get weather
+            weather_info = self.weather.get_weather(city)
+            
+            if weather_info:
+                await message.reply(weather_info)
+                self.db.update_user_stats(user_id, "total_weather_requests")
+                memory_manager.add_user_message(user_id, text, 'weather')
+                memory_manager.add_assistant_message(user_id, weather_info, 'weather')
+            else:
+                await message.reply(f"❌ Не удалось получить погоду для города: {city}")
+                
+        except Exception as e:
+            log_error(f"Ошибка получения погоды: {str(e)}")
+            await message.reply("❌ Ошибка при получении погоды.")
 
-        elif len(args) == 2:
-            # Проверяем угаданное число
-            try:
-                guess = int(args[1])
-                # В реальном приложении нужно получить сохраненное число для пользователя
-                target_number = random.randint(1, 100)  # Заглушка
-                result = game_service.check_guess(guess, target_number)
-                await message.reply(result)
-                log_info(f"Игра угадай число: {guess}", user_id)
-            except ValueError:
-                await message.reply("❌ Введите число!")
-
+    async def _handle_game_request(self, user_id: int, text: str, message: Message):
+        """Обработка игровых запросов."""
+        text_lower = text.lower()
+        
+        if any(word in text_lower for word in ['число', 'угадай', 'загадай']):
+            await self._start_guess_game(user_id, message)
+        elif any(word in text_lower for word in ['камень', 'ножницы', 'бумага', 'rps']):
+            await self._handle_rps_game(user_id, text, message)
+        elif any(word in text_lower for word in ['викторина', 'quiz', 'вопрос']):
+            await self._start_quiz_game(user_id, message)
+        elif any(word in text_lower for word in ['шар', 'ball', 'волшебный']):
+            await self._handle_magic_ball(user_id, text, message)
         else:
-            await message.reply("🎮 <b>Угадай число</b>\n\n"
-                              "• /guess - начать игру\n"
-                              "• /guess <число> - угадать число")
+            await self._show_games_menu(user_id, message)
 
-    async def cmd_fun_fact(self, message: types.Message):
-        """Интересный факт."""
+    async def _handle_fun_request(self, user_id: int, text: str, message: Message):
+        """Обработка запросов на развлекательный контент."""
+        await message.bot.send_chat_action(message.chat.id, ChatAction.TYPING)
+        
+        text_lower = text.lower()
+        
+        try:
+            if any(word in text_lower for word in ['факт', 'fact', 'интересно']):
+                response = await self.fun.get_random_fact_async()
+                self.db.update_user_stats(user_id, "total_facts")
+            elif any(word in text_lower for word in ['шутка', 'анекдот', 'joke', 'смешно']):
+                response = await self.fun.get_random_joke_async()
+                self.db.update_user_stats(user_id, "total_jokes")
+            elif any(word in text_lower for word in ['цитата', 'quote', 'мудрость']):
+                response = await self.fun.get_random_quote_async()
+                self.db.update_user_stats(user_id, "total_quotes")
+            else:
+                response = await self.fun.get_random_fact_async()
+                self.db.update_user_stats(user_id, "total_facts")
+                
+            if response:
+                await message.reply(response)
+                memory_manager.add_user_message(user_id, text, 'fun')
+                memory_manager.add_assistant_message(user_id, response, 'fun')
+            else:
+                await message.reply("❌ Не удалось получить контент.")
+                
+        except Exception as e:
+            log_error(f"Ошибка получения развлекательного контента: {str(e)}")
+            await message.reply("❌ Ошибка при получении контента.")
+
+    async def _generate_ai_response(self, user_id: int, text: str, message: Message):
+        """Генерация ответа через ИИ с улучшенным контекстом."""
+        await message.bot.send_chat_action(message.chat.id, ChatAction.TYPING)
+        
+        try:
+            memory_manager.add_user_message(user_id, text, 'text')
+            
+            context = memory_manager.get_user_context(user_id, limit=6)
+            
+            cache_key = f"{user_id}:{hash(text)}"
+            if cache_key in self.response_cache:
+                cached_response, timestamp = self.response_cache[cache_key]
+                if time.time() - timestamp < self.cache_ttl:
+                    await message.reply(cached_response)
+                    return
+            
+            task_type = gemini_client.detect_task_type(text)
+            response = await gemini_client.generate_text_response_async(
+                text, context=context, task_type=task_type
+            )
+            
+            if response:
+                if len(response) > 4000:
+                    response = response[:4000] + "...\n\n<i>Ответ обрезан из-за ограничений Telegram</i>"
+                
+                await message.reply(response, reply_markup=keyboard_manager.get_menu_button())
+                
+                self.response_cache[cache_key] = (response, time.time())
+                
+                self.db.log_message(user_id, "text", content=text, response=response)
+                self.db.update_user_stats(user_id, "total_messages")
+                memory_manager.add_assistant_message(user_id, response, 'text')
+                
+                log_info("Отправлен ответ на текстовое сообщение", user_id)
+            else:
+                error_msg = "❌ Извините, не удалось обработать ваш запрос. Попробуйте позже."
+                await message.reply(error_msg)
+                memory_manager.add_assistant_message(user_id, error_msg, 'text')
+                
+        except Exception as e:
+            log_error(f"Ошибка при генерации ответа: {str(e)}", user_id, e)
+            error_msg = "❌ Произошла ошибка при обработке сообщения."
+            await message.reply(error_msg)
+            memory_manager.add_assistant_message(user_id, error_msg, 'text')
+
+    async def handle_photo_message(self, message: Message):
+        """Улучшенный обработчик изображений."""
         user_id = message.from_user.id
-        fact = fun_service.get_random_fact()
-        await message.reply(fact)
-        log_info("Отправлен интересный факт", user_id)
+        log_info("Получено изображение", user_id)
+        
+        await message.bot.send_chat_action(message.chat.id, ChatAction.TYPING)
+        
+        try:
+            # Get the largest photo
+            photo = message.photo[-1]
+            file_info = await self.bot.get_file(photo.file_id)
+            file_data = await self.bot.download_file(file_info.file_path)
+            
+            prompt = message.caption or "Детально проанализируй это изображение. Опиши что видишь, определи контекст, настроение, стиль. Если есть текст - прочитай его."
+            
+            context = memory_manager.get_user_context(user_id, limit=3)
+            response = await gemini_client.analyze_image_async(
+                file_data.read(), prompt, context
+            )
+            
+            if response:
+                await message.reply(f"🖼️ <b>Анализ изображения:</b>\n\n{response}")
+                
+                # Update stats
+                self.db.log_message(user_id, "photo", content="[Изображение]", response=response)
+                self.db.update_user_stats(user_id, "total_messages")
+                memory_manager.add_user_message(user_id, "[Изображение]", 'photo')
+                memory_manager.add_assistant_message(user_id, response, 'photo')
+            else:
+                await message.reply("❌ Не удалось проанализировать изображение.")
+                
+        except Exception as e:
+            log_error(f"Ошибка при обработке изображения: {str(e)}", user_id, e)
+            await message.reply("❌ Ошибка при анализе изображения.")
 
-    async def cmd_fun_quote(self, message: types.Message):
-        """Мотивационная цитата."""
+    async def handle_voice_message(self, message: Message):
+        """Улучшенный обработчик голосовых сообщений."""
         user_id = message.from_user.id
-        quote = fun_service.get_motivational_quote()
-        await message.reply(quote)
-        log_info("Отправлена мотивационная цитата", user_id)
+        log_info("Получено голосовое сообщение", user_id)
+        
+        await message.bot.send_chat_action(message.chat.id, ChatAction.TYPING)
+        
+        try:
+            file_info = await self.bot.get_file(message.voice.file_id)
+            file_data = await self.bot.download_file(file_info.file_path)
+            
+            transcription = await gemini_client.transcribe_audio_async(
+                file_data.read(), "audio/ogg"
+            )
+            
+            if transcription:
+                await message.reply(f"🎵 <b>Распознанный текст:</b>\n{transcription}")
+                
+                context = memory_manager.get_user_context(user_id, limit=4)
+                ai_response = await gemini_client.generate_text_response_async(
+                    transcription, context=context
+                )
+                
+                if ai_response:
+                    await message.reply(f"💬 <b>Ответ:</b>\n\n{ai_response}")
+                    memory_manager.add_assistant_message(user_id, ai_response, 'voice_response')
+                
+                # Update stats
+                self.db.log_message(user_id, "voice", content=transcription, response=ai_response)
+                self.db.update_user_stats(user_id, "total_messages")
+                memory_manager.add_user_message(user_id, transcription, 'voice')
+            else:
+                await message.reply("❌ Не удалось распознать речь.")
+                
+        except Exception as e:
+            log_error(f"Ошибка при обработке голосового сообщения: {str(e)}", user_id, e)
+            await message.reply("❌ Ошибка при распознавании речи.")
 
-    async def cmd_fun_joke(self, message: types.Message):
-        """Шутка."""
+    async def handle_audio_message(self, message: types.Message):
+        """Обработчик аудио файлов."""
         user_id = message.from_user.id
-        joke = fun_service.get_random_joke()
-        await message.reply(joke)
-        log_info("Отправлена шутка", user_id)
+        log_info("Получен аудио файл", user_id)
 
-    async def cmd_game_dice(self, message: types.Message):
-        """Игра в кости с настоящими бросками :game_die:."""
+        # Отправляем индикатор "загружает аудио"
+        await message.bot.send_chat_action(message.chat.id, "upload_voice")
+
+        try:
+            # Проверяем размер файла
+            if message.audio.file_size > config.MAX_FILE_SIZE:
+                await message.reply("❌ Файл слишком большой. Максимальный размер: 20MB")
+                return
+
+            # Скачиваем аудио файл
+            file_info = await message.bot.get_file(message.audio.file_id)
+            audio_data = await message.bot.download_file(file_info.file_path)
+
+            # Определяем MIME-тип на основе расширения файла
+            mime_type = "audio/mpeg"  # по умолчанию
+            if hasattr(message.audio, 'file_name') and message.audio.file_name:
+                if message.audio.file_name.lower().endswith('.ogg'):
+                    mime_type = "audio/ogg"
+                elif message.audio.file_name.lower().endswith('.mp3'):
+                    mime_type = "audio/mpeg"
+                elif message.audio.file_name.lower().endswith('.wav'):
+                    mime_type = "audio/wav"
+
+            # Распознаем текст через Gemini API
+            recognized_text = gemini_client.transcribe_audio_with_gemini(audio_data.read(), mime_type)
+
+            if recognized_text:
+                log_info(f"Распознан текст из аудио файла через Gemini: {recognized_text[:100]}...", user_id)
+
+                # Отправляем распознанный текст пользователю
+                await message.reply(f"🎵 <i>Распознанный текст:</i> {recognized_text}")
+
+                # Генерируем ответ через Gemini
+                response = gemini_client.generate_text_response(recognized_text)
+
+                if response:
+                    await message.reply(response)
+                    log_info("Отправлен ответ на аудио файл", user_id)
+                else:
+                    await message.reply("❌ Не удалось обработать распознанный текст.")
+                    log_error("Не удалось сгенерировать ответ на аудио файл", user_id)
+            else:
+                await message.reply("❌ Не удалось распознать текст в аудио файле. Попробуйте другой формат файла.")
+                log_error("Не удалось распознать текст в аудио файле", user_id)
+
+        except Exception as e:
+            log_error(f"Ошибка при обработке аудио файла: {str(e)}", user_id, e)
+            await message.reply("❌ Произошла ошибка при обработке аудио файла.")
+
+    async def handle_video_message(self, message: types.Message):
+        """Обработчик видео файлов."""
         user_id = message.from_user.id
+        log_info("Получен видео файл", user_id)
 
-        # Показываем инструкцию по игре
-        instruction_text = "🎲 <b>Игра в кости</b>\n\n" \
-                          "🎯 <b>Как играть:</b>\n" \
-                          "1. Я брошу кубик 🎲\n" \
-                          "2. Ты бросаешь кубик 🎲\n" \
-                          "3. Сравниваем результаты!\n\n" \
-                          "💡 <b>Используй настоящий :game_die: эмодзи!</b>\n\n" \
-                          "Отправь: 🎲 (или просто брось кубик)"
+        # Отправляем индикатор "загружает видео"
+        await message.bot.send_chat_action(message.chat.id, "upload_video")
 
-        await message.reply(instruction_text, reply_markup=keyboard_manager.get_dice_start_menu())
-        log_info("Начата игра в кости", user_id)
+        try:
+            # Проверяем размер файла
+            if message.video.file_size > config.MAX_FILE_SIZE:
+                await message.reply("❌ Файл слишком большой. Максимальный размер: 20MB")
+                return
+
+            # Скачиваем видео файл
+            file_info = await self.bot.get_file(message.video.file_id)
+            video_data = await self.bot.download_file(file_info.file_path)
+
+            # Анализируем видео через Gemini API (пока что просто описание)
+            prompt = "Опиши это видео подробно на русском языке. Что на нем происходит?"
+            response = gemini_client.generate_text_response(prompt)
+
+            if response:
+                log_info(f"Отправлено описание видео файла через Gemini: {response[:100]}...", user_id)
+
+                # Отправляем описание пользователю
+                await message.reply(f"🎬 <i>Описание видео:</i> {response}")
+            else:
+                await message.reply("❌ Не удалось проанализировать видео файл.")
+                log_error("Не удалось проанализировать видео файл", user_id)
+
+        except Exception as e:
+            log_error(f"Ошибка при обработке видео файла: {str(e)}", user_id, e)
+            await message.reply("❌ Произошла ошибка при обработке видео файла.")
+
+    async def handle_document_message(self, message: types.Message):
+        """Обработчик файлов документов."""
+        user_id = message.from_user.id
+        log_info("Получен файл документа", user_id)
+
+        # Отправляем индикатор "загружает документ"
+        await message.bot.send_chat_action(message.chat.id, "upload_document")
+
+        try:
+            # Проверяем размер файла
+            if message.document.file_size > config.MAX_FILE_SIZE:
+                await message.reply("❌ Файл слишком большой. Максимальный размер: 20MB")
+                return
+
+            # Скачиваем файл
+            file_info = await self.bot.get_file(message.document.file_id)
+            file_data = await self.bot.download_file(file_info.file_path)
+
+            # Анализируем документ через Gemini API (пока что просто описание)
+            prompt = "Опиши этот документ подробно на русском языке. Что в нем содержится?"
+            response = gemini_client.generate_text_response(prompt)
+
+            if response:
+                log_info(f"Отправлено описание документа через Gemini: {response[:100]}...", user_id)
+
+                # Отправляем описание пользователю
+                await message.reply(f"📄 <i>Описание документа:</i> {response}")
+            else:
+                await message.reply("❌ Не удалось проанализировать документ.")
+                log_error("Не удалось проанализировать документ", user_id)
+
+        except Exception as e:
+            log_error(f"Ошибка при обработке файла документа: {str(e)}", user_id, e)
+            await message.reply("❌ Произошла ошибка при обработке файла документа.")
 
     async def handle_dice_message(self, message: types.Message):
         """Обработка отправки dice эмодзи пользователем."""
@@ -2688,14 +2902,124 @@ class AIBot:
 
     async def start_polling(self):
         """Запускает бота в режиме polling."""
-        log_info("Запуск бота в режиме polling")
-        await self.dp.start_polling(self.bot)
+        try:
+            log_info("Запуск бота в режиме polling...")
+            await self.dp.start_polling(self.bot)
+        except Exception as e:
+            log_error(f"Ошибка при запуске polling: {str(e)}")
+            raise
+        finally:
+            await self.stop()
 
     async def stop(self):
-        """Останавливает бота."""
-        log_info("Остановка бота")
-        await self.bot.session.close()
+        """Останавливает бота и освобождает ресурсы."""
+        try:
+            log_info("Остановка бота...")
+            await self.bot.session.close()
+            await gemini_client.close()
+            log_info("Бот остановлен")
+        except Exception as e:
+            log_error(f"Ошибка при остановке бота: {str(e)}")
 
+    async def _start_guess_game(self, user_id: int, message: Message):
+        """Начинает игру "Угадай число"."""
+        # Устанавливаем активную игру
+        memory_manager.set_user_active_game(user_id, "guess_number")
+
+        # Генерируем случайное число
+        target_number = self.games.generate_number()
+
+        # Сохраняем число в памяти
+        memory_manager.set_user_game_data(user_id, "guess_number", {"target_number": target_number})
+
+        # Отправляем сообщение
+        await message.reply("🔢 Я загадал число от 1 до 100. Попробуй угадать!")
+
+    async def _handle_rps_game(self, user_id: int, text: str, message: Message):
+        """Обрабатывает игру "Камень, ножницы, бумага"."""
+        # Устанавливаем активную игру
+        memory_manager.set_user_active_game(user_id, "rps")
+
+        # Получаем выбор пользователя
+        user_choice = text.lower()
+
+        # Проверяем, что выбор пользователя допустимый
+        if user_choice not in ["камень", "ножницы", "бумага"]:
+            await message.reply("🪨 Выбери: камень, ножницы или бумага")
+            return
+
+        # Получаем выбор бота
+        bot_choice = self.games.get_bot_choice()
+
+        # Определяем победителя
+        result = self.games.determine_winner(user_choice, bot_choice)
+
+        # Отправляем сообщение
+        await message.reply(f"🪨 Ты выбрал: {user_choice}\n🤖 Я выбрал: {bot_choice}\n\n{result}")
+
+        # Очищаем активную игру
+        memory_manager.clear_user_active_game(user_id)
+
+    async def _start_quiz_game(self, user_id: int, message: Message):
+        """Начинает игру "Викторина"."""
+        # Устанавливаем активную игру
+        memory_manager.set_user_active_game(user_id, "quiz")
+
+        # Получаем вопрос
+        question = self.games.get_random_question()
+
+        # Сохраняем вопрос в памяти
+        memory_manager.set_user_game_data(user_id, "quiz", {"question": question})
+
+        # Отправляем сообщение
+        await message.reply(f"🧠 {question}")
+
+    async def _handle_magic_ball(self, user_id: int, text: str, message: Message):
+        """Обрабатывает игру "Волшебный шар"."""
+        # Устанавливаем активную игру
+        memory_manager.set_user_active_game(user_id, "magic_ball")
+
+        # Получаем ответ
+        answer = self.games.get_magic_ball_answer()
+
+        # Отправляем сообщение
+        await message.reply(f"🎱 {answer}")
+
+        # Очищаем активную игру
+        memory_manager.clear_user_active_game(user_id)
+
+    async def _show_games_menu(self, user_id: int, message: Message):
+        """Показывает меню игр."""
+        await message.reply("🎮 Выбери игру:", reply_markup=keyboard_manager.get_games_menu())
+
+    async def _handle_persona_change(self, user_id: int, text: str, message: Message):
+        """Обрабатывает смену режима общения."""
+        text_lower = text.lower()
+
+        if any(word in text_lower for word in ['дружелюбный', 'friendly']):
+            persona_type = PersonaType.FRIENDLY
+        elif any(word in text_lower for word in ['программист', 'programmer', 'код', 'code']):
+            persona_type = PersonaType.PROGRAMMER
+        elif any(word in text_lower for word in ['эксперт', 'expert']):
+            persona_type = PersonaType.EXPERT
+        elif any(word in text_lower for word in ['креативный', 'creative', 'идеи', 'ideas']):
+            persona_type = PersonaType.CREATIVE
+        elif any(word in text_lower for word in ['профессиональный', 'professional', 'бизнес', 'business']):
+            persona_type = PersonaType.PROFESSIONAL
+        else:
+            await message.reply("🎭 Неизвестный режим общения.")
+            return
+
+        if persona_manager.set_persona(persona_type):
+            current = persona_manager.get_current_persona()
+            log_info(f"Пользователь переключился в режим: {current.name}", user_id)
+
+            # Сохраняем выбранную персону в память пользователя
+            memory_manager.update_user_persona(user_id, current.name)
+
+            await message.reply(f"🎭 Переключен в режим: <b>{current.name}</b>\n\n{current.description}")
+        else:
+            await message.reply("❌ Не удалось переключить режим")
 
 # Создаем глобальный экземпляр бота
-ai_bot = AIBot()
+ai_bot = EnhancedAIBot()
