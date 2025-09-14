@@ -29,7 +29,7 @@ from utils import (
 from keyboards import keyboard_manager
 
 
-class EnhancedAIBot:
+class AIBot:
     """Улучшенный Telegram бот с ИИ и естественным взаимодействием."""
 
     def __init__(self):
@@ -3022,4 +3022,4 @@ class EnhancedAIBot:
             await message.reply("❌ Не удалось переключить режим")
 
 # Создаем глобальный экземпляр бота
-ai_bot = EnhancedAIBot()
+ai_bot = AIBot()
