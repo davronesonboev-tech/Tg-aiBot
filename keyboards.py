@@ -112,21 +112,28 @@ class KeyboardManager:
 
         # Добавляем варианты ответов как кнопки с цифрами
         for i, option in enumerate(options):
-            # Показываем цифру + начало варианта (до 25 символов)
-            short_option = option[:25] + "..." if len(option) > 25 else option
-            button_text = f"{i+1}. {short_option}"
+            # Показываем цифру + начало варианта (до 30 символов для лучшей читаемости)
+            short_option = option[:30] + "..." if len(option) > 30 else option
+            button_text = f"{i+1}️⃣ {short_option}"
             builder.button(text=button_text, callback_data=f"quiz_answer_{i+1}")
 
-        # Кнопка подсказки с количеством
+        # Кнопка подсказки с количеством и эмодзи
         if max_hints > 0:
-            hint_text = f"💡 Подсказка ({remaining_hints}/{max_hints})"
-            builder.button(text=hint_text, callback_data="quiz_hint")
+            if remaining_hints > 0:
+                hint_text = f"💡 Подсказка ({remaining_hints}/{max_hints})"
+                builder.button(text=hint_text, callback_data="quiz_hint")
+            else:
+                builder.button(text="❌ Подсказки закончились", callback_data="quiz_hint_disabled")
         else:
-            builder.button(text="❌ Подсказки недоступны", callback_data="quiz_hint_disabled")
+            builder.button(text="🎯 Только ты и вопрос!", callback_data="quiz_no_hints")
 
-        builder.button(text="⬅️ Назад в игры", callback_data="menu_games")
+        # Добавим кнопку для пропуска вопроса (если много подсказок использовано)
+        if used_hints >= 2:
+            builder.button(text="⏭️ Пропустить вопрос", callback_data="quiz_skip")
 
-        builder.adjust(1, 1, 1, 1, 2)  # 4 варианта + подсказка + назад
+        builder.button(text="🏠 Главное меню", callback_data="menu_main")
+
+        builder.adjust(1, 1, 1, 1, 2, 2)  # Адаптивная раскладка
 
         return builder.as_markup()
 
