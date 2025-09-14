@@ -282,13 +282,38 @@ class MemoryManager:
                 if isinstance(value, dict):
                     self._convert_datetime_in_dict(value, _seen)
                 elif hasattr(value, 'isoformat') and callable(getattr(value, 'isoformat', None)):
-                    data[key] = value.isoformat()
+                    try:
+                        data[key] = value.isoformat()
+                    except (AttributeError, TypeError):
+                        # Если isoformat не работает, пропускаем
+                        pass
                 elif isinstance(value, list):
                     for i, item in enumerate(value):
                         if isinstance(item, dict):
                             self._convert_datetime_in_dict(item, _seen)
                         elif hasattr(item, 'isoformat') and callable(getattr(item, 'isoformat', None)):
-                            value[i] = item.isoformat()
+                            try:
+                                value[i] = item.isoformat()
+                            except (AttributeError, TypeError):
+                                # Если isoformat не работает, пропускаем
+                                pass
+                elif hasattr(value, '__dict__'):
+                    # Проверяем сложные объекты на наличие datetime полей
+                    try:
+                        for attr_name in dir(value):
+                            if not attr_name.startswith('_'):
+                                attr_value = getattr(value, attr_name, None)
+                                if hasattr(attr_value, 'isoformat') and callable(getattr(attr_value, 'isoformat', None)):
+                                    try:
+                                        setattr(value, attr_name, attr_value.isoformat())
+                                    except (AttributeError, TypeError):
+                                        pass
+                    except (AttributeError, TypeError):
+                        pass
+        except Exception as e:
+            # Логируем ошибку, но не прерываем процесс
+            from logger import log_error
+            log_error(f"Ошибка при конвертации datetime в словаре: {str(e)}")
         finally:
             _seen.discard(data_id)
 
