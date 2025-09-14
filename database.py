@@ -183,7 +183,7 @@ class SystemStats(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     stat_type = Column(String(100), index=True)
     value = Column(BigInteger, default=0)
-    metadata = Column(JSON, nullable=True)
+    system_metadata = Column(JSON, nullable=True)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, index=True)
 
 class UserAnalytics(Base):
@@ -316,7 +316,7 @@ class EnhancedDatabaseManager:
                 stat = SystemStats(
                     stat_type=f"event_{event_type}",
                     value=1,
-                    metadata=data
+                    system_metadata=data
                 )
                 session.add(stat)
                 session.commit()
