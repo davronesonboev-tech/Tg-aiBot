@@ -256,15 +256,42 @@ class MemoryManager:
                     # Обработка datetime в game_data
                     if 'game_data' in game_state and game_state['game_data']:
                         game_data = game_state['game_data']
-                        self._convert_datetime_in_dict(game_data)
+                        try:
+                            self._convert_datetime_in_dict(game_data)
+                        except Exception as e:
+                            log_error(f"Ошибка обработки game_data для пользователя {user_id}: {str(e)}")
+                            # Если не получается обработать, очищаем game_data
+                            game_state['game_data'] = {}
 
                 data[str(user_id)] = memory_data
 
             with open(self.storage_file, 'w', encoding='utf-8') as f:
-                json.dump(data, f, ensure_ascii=False, indent=2)
+                try:
+                    json.dump(data, f, ensure_ascii=False, indent=2, default=self._json_serializer)
+                except (TypeError, ValueError) as e:
+                    log_error(f"Ошибка JSON сериализации, пробуем fallback: {str(e)}")
+                    # Fallback: очищаем проблемные данные и пробуем снова
+                    for user_data in data.values():
+                        if 'metadata' in user_data and 'game_state' in user_data['metadata']:
+                            user_data['metadata']['game_state']['game_data'] = {}
+                    json.dump(data, f, ensure_ascii=False, indent=2, default=self._json_serializer)
 
         except Exception as e:
             log_error(f"Ошибка при сохранении воспоминаний: {str(e)}")
+
+    def _json_serializer(self, obj):
+        """Сериализатор для JSON с обработкой специальных типов."""
+        if hasattr(obj, 'isoformat') and callable(getattr(obj, 'isoformat', None)):
+            try:
+                return obj.isoformat()
+            except (AttributeError, TypeError):
+                return str(obj)
+        elif hasattr(obj, '__dict__'):
+            # Для объектов с __dict__ возвращаем словарь атрибутов
+            return str(obj)
+        else:
+            # Для остальных объектов возвращаем строковое представление
+            return str(obj)
 
     def _convert_datetime_in_dict(self, data: dict, _seen=None) -> None:
         """Рекурсивно конвертирует datetime объекты в строки в словаре."""
