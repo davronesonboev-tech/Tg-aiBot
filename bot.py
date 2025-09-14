@@ -819,7 +819,7 @@ class AIBot:
         """Викторина."""
         user_id = message.from_user.id
 
-        question = game_service.get_random_question()
+        question = self.games.get_random_question()
         await message.reply(question)
         log_info("Отправлен вопрос викторины", user_id)
 
@@ -838,7 +838,7 @@ class AIBot:
             return
 
         question = args[1]
-        answer = game_service.get_magic_ball_answer()
+        answer = self.games.get_magic_ball_answer()
 
         await message.reply(f"❓ <b>Твой вопрос:</b> {question}\n\n{answer}")
         log_info(f"Ответ волшебного шара на вопрос: {question[:50]}...", user_id)
@@ -938,7 +938,7 @@ class AIBot:
 
             elif callback_data.startswith("rps_"):
                 user_choice = callback_data.split("_", 1)[1]
-                result_text, game_data = game_service.play_rps(user_choice, user_id)
+                result_text, game_data = self.games.play_rps(user_choice, user_id)
 
                 # Создаем расширенное меню с историей и статистикой
                 rps_menu = keyboard_manager.get_rps_choice_menu()
@@ -973,7 +973,7 @@ class AIBot:
 
             elif callback_data == "rps_stats":
                 # Показываем статистику игр
-                stats = game_service.get_rps_stats(user_id)
+                stats = self.games.get_rps_stats(user_id)
 
                 if stats['total_games'] == 0:
                     stats_text = "📊 <b>Статистика игр</b>\n\n" \
@@ -1001,7 +1001,7 @@ class AIBot:
 
             elif callback_data == "rps_history":
                 # Показываем историю последних игр
-                history = game_service.get_rps_history(user_id, limit=10)
+                history = self.games.get_rps_history(user_id, limit=10)
 
                 if not history:
                     history_text = "📚 <b>История игр</b>\n\n" \
@@ -1216,7 +1216,7 @@ class AIBot:
 
             elif callback_data == "dice_stats":
                 # Показываем статистику игр в кости
-                stats = game_service.get_dice_stats(user_id)
+                stats = self.games.get_dice_stats(user_id)
 
                 if stats['total_games'] == 0:
                     stats_text = "📊 <b>Статистика игр в кости</b>\n\n" \
@@ -1247,7 +1247,7 @@ class AIBot:
 
             elif callback_data == "dice_history":
                 # Показываем историю последних игр в кости
-                history = game_service.get_dice_history(user_id, limit=10)
+                history = self.games.get_dice_history(user_id, limit=10)
 
                 if not history:
                     history_text = "📚 <b>История игр в кости</b>\n\n" \
@@ -1304,7 +1304,7 @@ class AIBot:
 
             elif callback_data.startswith("guess_"):
                 difficulty = callback_data.split("_", 1)[1]
-                message_text, target_number = game_service.guess_number_game(difficulty)
+                message_text, target_number = self.games.guess_number_game(difficulty)
 
                 # Устанавливаем активную игру и сохраняем данные
                 memory_manager.set_user_active_game(user_id, "guess_number", {
@@ -1738,17 +1738,17 @@ class AIBot:
 
             # Развлечения
             elif callback_data == "fun_joke":
-                joke = fun_service.get_random_joke()
+                joke = self.fun.get_random_joke()
                 joke_text = f"🤣 <b>Шутка:</b>\n\n{joke}"
                 await self._safe_edit_message(callback, joke_text, keyboard_manager.get_tools_menu())
 
             elif callback_data == "fun_quote":
-                quote = fun_service.get_motivational_quote()
+                quote = self.fun.get_motivational_quote()
                 quote_text = f"💡 <b>Мотивационная цитата:</b>\n\n{quote}"
                 await self._safe_edit_message(callback, quote_text, keyboard_manager.get_tools_menu())
 
             elif callback_data == "fun_fact":
-                fact = fun_service.get_random_fact()
+                fact = self.fun.get_random_fact()
                 await self._safe_edit_message(callback, fact, keyboard_manager.get_tools_menu())
 
             # Служебные функции
@@ -1886,7 +1886,7 @@ class AIBot:
         region_name = region_map.get(callback_data, callback_data.replace("weather_", "").title())
 
         # Получаем погоду
-        weather_info = weather_service.get_weather(region_name)
+        weather_info = self.weather.get_weather(region_name)
 
         if weather_info:
             # Показываем погоду и возвращаемся к меню областей
@@ -2288,7 +2288,7 @@ class AIBot:
                     target_number = game_data.get('target_number')
 
                     if target_number:
-                        result = game_service.check_guess(guess, target_number)
+                        result = self.games.check_guess(guess, target_number)
 
                         if "Правильно" in result:
                             # Игра окончена
@@ -2314,7 +2314,7 @@ class AIBot:
                     question = game_data.get('question', '')
 
                     if correct_answer:
-                        result = game_service.check_quiz_answer(question, text, correct_answer)
+                        result = self.games.check_quiz_answer(question, text, correct_answer)
 
                         if "Правильно" in result:
                             # Викторина окончена
@@ -2353,7 +2353,7 @@ class AIBot:
                 # Проверяем выбор в камень-ножницы-бумага
                 choices = ['камень', 'ножницы', 'бумага']
                 if text.lower() in choices:
-                    result_text, game_data = game_service.play_rps(text.lower(), user_id)
+                    result_text, game_data = self.games.play_rps(text.lower(), user_id)
                     memory_manager.clear_user_active_game(user_id)
 
                     # Показываем результат и меню для продолжения
@@ -2370,7 +2370,7 @@ class AIBot:
             elif active_game == "magic_ball":
                 # Любой текст считается вопросом к волшебному шару
                 if len(text.strip()) > 0:
-                    answer = game_service.get_magic_ball_answer(text.strip())
+                    answer = self.games.get_magic_ball_answer(text.strip())
                     memory_manager.clear_user_active_game(user_id)
                     await message.reply(f"❓ <b>Твой вопрос:</b> {text}\n\n{answer}\n\nХочешь спросить еще? Нажми '🎱 Волшебный шар'!", reply_markup=keyboard_manager.get_menu_button())
 
@@ -2491,7 +2491,7 @@ class AIBot:
 
     async def _process_weather_request(self, user_id: int, city: str, message: types.Message) -> bool:
         """Обрабатывает запрос погоды."""
-        weather_info = weather_service.get_weather(city)
+        weather_info = self.weather.get_weather(city)
 
         if weather_info:
             await message.reply(weather_info, reply_markup=keyboard_manager.get_menu_button())
@@ -2593,7 +2593,7 @@ class AIBot:
         text_lower = text.lower()
 
         if 'шутка' in text_lower or 'joke' in text_lower:
-            joke = fun_service.get_random_joke()
+            joke = self.fun.get_random_joke()
             await message.reply(f"😂 <b>Шутка:</b>\n\n{joke}", reply_markup=keyboard_manager.get_menu_button())
             log_info("Отправлена шутка", user_id)
 
@@ -2605,7 +2605,7 @@ class AIBot:
                 log_error(f"Ошибка логирования шутки пользователя {user_id}: {str(e)}")
 
         elif 'факт' in text_lower or 'fact' in text_lower:
-            fact = fun_service.get_random_fact()
+            fact = self.fun.get_random_fact()
             await message.reply(f"🧠 <b>Интересный факт:</b>\n\n{fact}", reply_markup=keyboard_manager.get_menu_button())
             log_info("Отправлен факт", user_id)
 
@@ -2617,7 +2617,7 @@ class AIBot:
                 log_error(f"Ошибка логирования факта пользователя {user_id}: {str(e)}")
 
         elif 'цитата' in text_lower or 'quote' in text_lower:
-            quote = fun_service.get_random_quote()
+            quote = self.fun.get_motivational_quote()
             await message.reply(f"💭 <b>Цитата:</b>\n\n{quote}", reply_markup=keyboard_manager.get_menu_button())
             log_info("Отправлена цитата", user_id)
 
@@ -2630,7 +2630,7 @@ class AIBot:
 
         else:
             # По умолчанию отправляем факт
-            fact = fun_service.get_random_fact()
+            fact = self.fun.get_random_fact()
             await message.reply(f"🧠 <b>Интересный факт:</b>\n\n{fact}", reply_markup=keyboard_manager.get_menu_button())
             log_info("Отправлен факт", user_id)
 
@@ -2804,11 +2804,11 @@ class AIBot:
                 selected_industry = industry
 
             # Генерируем вопрос
-            quiz_data = game_service.generate_quiz_question_specific(selected_industry)
+            quiz_data = self.games.generate_quiz_question_specific(selected_industry)
 
             if not quiz_data:
                 # Fallback на общий генератор
-                quiz_data = game_service.generate_quiz_question()
+                quiz_data = self.games.generate_quiz_question()
 
             if quiz_data:
                 quiz_session['questions'].append(quiz_data)
