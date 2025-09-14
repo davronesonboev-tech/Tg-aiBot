@@ -20,12 +20,12 @@ from personas import persona_manager
 
 
 class GeminiClient:
-    """Улучшенный клиент для взаимодействия с Google Gemini 2.5 Pro API."""
+    """Улучшенный клиент для взаимодействия с Google Gemini 1.5 Pro API."""
 
     def __init__(self):
         """Инициализирует клиент Gemini."""
         self.api_key = config.GOOGLE_API_KEY
-        self.model = "models/gemini-2.0-flash-exp"  # Updated to latest model
+        self.model = config.GEMINI_MODEL  # Используем модель из конфигурации
         self.timeout = config.REQUEST_TIMEOUT
         self.base_url = config.GEMINI_BASE_URL
         self.session = None
