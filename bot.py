@@ -1621,9 +1621,11 @@ class AIBot:
                 industry = callback_data.replace("quiz_industry_", "")
                 game_data = memory_manager.get_user_game_data(user_id)
 
-                if game_data:
-                    game_data['industry'] = industry
-                    memory_manager.update_user_game_data(user_id, "quiz_setup", game_data)
+                if not game_data:
+                    game_data = {}
+
+                game_data['industry'] = industry
+                memory_manager.update_user_game_data(user_id, "quiz_setup", game_data)
 
                     industry_names = {
                         'биология': '🧬 Биология',
@@ -1650,7 +1652,10 @@ class AIBot:
                     selected_name = industry_names.get(industry, industry.capitalize())
 
                     settings_text = f"✅ <b>Отрасль выбрана:</b> {selected_name}\n\n" \
-                                   "🎯 Выберите остальные параметры или начните игру!"
+                                   f"🎯 <b>Текущие настройки:</b>\n" \
+                                   f"• Отрасль: {selected_name}\n" \
+                                   f"• Количество: {game_data.get('question_count', 'не выбрано')} вопросов\n\n" \
+                                   f"📝 Выберите следующие параметры или начните игру!"
 
                     await self._safe_edit_message(callback, settings_text, keyboard_manager.get_quiz_settings_menu())
 
@@ -1672,14 +1677,19 @@ class AIBot:
                 count = int(callback_data.replace("quiz_count_", ""))
                 game_data = memory_manager.get_user_game_data(user_id)
 
-                if game_data:
-                    game_data['question_count'] = count
-                    memory_manager.update_user_game_data(user_id, "quiz_setup", game_data)
+                if not game_data:
+                    game_data = {}
 
-                    settings_text = f"✅ <b>Количество вопросов:</b> {count}\n\n" \
-                                   "🎯 Выберите остальные параметры или начните игру!"
+                game_data['question_count'] = count
+                memory_manager.update_user_game_data(user_id, "quiz_setup", game_data)
 
-                    await self._safe_edit_message(callback, settings_text, keyboard_manager.get_quiz_settings_menu())
+                settings_text = f"✅ <b>Количество вопросов:</b> {count}\n\n" \
+                               f"🎯 <b>Текущие настройки:</b>\n" \
+                               f"• Отрасль: {game_data.get('industry', 'не выбрана')}\n" \
+                               f"• Количество: {count} вопросов\n\n" \
+                               f"📝 Выберите следующие параметры или начните игру!"
+
+                await self._safe_edit_message(callback, settings_text, keyboard_manager.get_quiz_settings_menu())
 
             elif callback_data == "quiz_start":
                 # Начало викторины
