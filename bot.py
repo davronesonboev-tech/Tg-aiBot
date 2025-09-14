@@ -811,7 +811,6 @@ class AIBot:
                         timestamp = ""
                         if game.get('timestamp'):
                             try:
-                                from datetime import datetime
                                 dt = datetime.fromisoformat(game['timestamp'].replace('Z', '+00:00'))
                                 timestamp = dt.strftime("%H:%M")
                             except:
@@ -1064,7 +1063,6 @@ class AIBot:
                         timestamp = ""
                         if game.get('timestamp'):
                             try:
-                                from datetime import datetime
                                 dt = datetime.fromisoformat(game['timestamp'].replace('Z', '+00:00'))
                                 timestamp = dt.strftime("%H:%M")
                             except:
