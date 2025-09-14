@@ -49,20 +49,17 @@ class GeminiClient:
     def check_available_models(self) -> list:
         """Проверяет доступные модели Gemini API."""
         try:
+            import requests
             url = f"https://generativelanguage.googleapis.com/v1beta/models?key={self.api_key}"
 
-            if not self.session:
-                self.session = aiohttp.ClientSession()
-
-            async with self.session.get(url, timeout=self.timeout) as response:
-                if response.status == 200:
-                    data = await response.json()
-                    models = [model['name'] for model in data.get('models', [])]
-                    return models
-                else:
-                    error_text = await response.text()
-                    print(f"❌ Ошибка проверки моделей: {response.status} - {error_text}")
-                    return []
+            response = requests.get(url, timeout=self.timeout)
+            if response.status_code == 200:
+                data = response.json()
+                models = [model['name'] for model in data.get('models', [])]
+                return models
+            else:
+                print(f"❌ Ошибка проверки моделей: {response.status_code} - {response.text}")
+                return []
 
         except Exception as e:
             print(f"❌ Ошибка при проверке моделей: {str(e)}")
