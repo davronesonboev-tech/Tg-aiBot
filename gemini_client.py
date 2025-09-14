@@ -20,7 +20,7 @@ from personas import persona_manager
 
 
 class GeminiClient:
-    """Улучшенный клиент для взаимодействия с Google Gemini 2.5 Pro API."""
+    """Улучшенный клиент для взаимодействия с Google Gemini 1.5 Pro API."""
 
     def __init__(self):
         """Инициализирует клиент Gemini."""
