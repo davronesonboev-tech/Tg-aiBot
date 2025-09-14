@@ -4,6 +4,7 @@
 """
 
 import asyncio
+import random
 from datetime import datetime
 from typing import Optional, Tuple
 
@@ -1150,11 +1151,26 @@ class AIBot:
 
                         if is_correct:
                             quiz_session['correct_answers'] += 1
+                            correct_responses = [
+                                "🎉 Браво! Ты настоящий знаток!",
+                                "✅ Отлично! Продолжай в том же духе!",
+                                "🏆 Молодец! Ты на верном пути!",
+                                "💎 Прекрасный ответ!",
+                                "🎯 В точку! Ты гений!",
+                                "🌟 Потрясающе! Так держать!"
+                            ]
                             result_emoji = "✅"
-                            result_text = "Правильно!"
+                            result_text = random.choice(correct_responses)
                         else:
+                            wrong_responses = [
+                                "❌ Почти угадал, но не совсем...",
+                                "😅 Ну почти! В следующий раз повезет!",
+                                "🤔 Хорошая попытка, но ответ другой!",
+                                "💭 Думал-думал, но не угадал!",
+                                "🎭 Ответ был близко, но не совсем!"
+                            ]
                             result_emoji = "❌"
-                            result_text = f"Неправильно!\n\n💡 Правильный ответ: {question_data['options'][int(correct_answer)-1]}"
+                            result_text = f"{random.choice(wrong_responses)}\n\n💡 Правильный ответ: <b>{question_data['options'][int(correct_answer)-1]}</b>"
 
                         # Обновляем сессию
                         quiz_session['current_question'] += 1
@@ -1167,24 +1183,49 @@ class AIBot:
                             correct_answers = quiz_session['correct_answers']
                             percentage = (correct_answers / total_questions * 100) if total_questions > 0 else 0
 
-                            # Определяем оценку
-                            if percentage >= 90:
-                                grade = "Отлично! Ты эксперт! 🏆"
+                            # Определяем оценку и персонализированные сообщения
+                            if percentage >= 95:
+                                grade = "🌟 ЛЕГЕНДА! Ты гений викторин!"
+                                emoji = "🏆"
+                                motivation = "Ты знаешь абсолютно всё! Продолжай удивлять мир своими знаниями!"
+                            elif percentage >= 85:
+                                grade = "🎯 СУПЕРЗНАТОК! Потрясающий результат!"
+                                emoji = "🎖️"
+                                motivation = "Ты настоящий эксперт! Твои знания впечатляют!"
                             elif percentage >= 75:
-                                grade = "Хорошо! Продолжай в том же духе! 👏"
-                            elif percentage >= 50:
-                                grade = "Неплохо! Можно лучше! 💪"
+                                grade = "💎 ОТЛИЧНО! Ты на высоте!"
+                                emoji = "👑"
+                                motivation = "Отличная работа! Ты показал глубокие знания!"
+                            elif percentage >= 60:
+                                grade = "✅ ХОРОШО! Неплохо справиился!"
+                                emoji = "👍"
+                                motivation = "Хороший результат! Есть над чем работать, но ты на правильном пути!"
+                            elif percentage >= 40:
+                                grade = "🤔 НЕПЛОХО! Можно лучше!"
+                                emoji = "💪"
+                                motivation = "Ты показал базовые знания! Есть куда расти и развиваться!"
                             else:
-                                grade = "Нужно подучить материал! 📚"
+                                grade = "📚 НУЖНО ПОУЧИТЬСЯ!"
+                                emoji = "🎓"
+                                motivation = "Не расстраивайся! Каждый начинает с малого. Главное - не останавливайся!"
 
-                            final_text = f"🏁 <b>Викторина завершена!</b>\n\n" \
-                                       f"📊 <b>Результаты:</b>\n" \
-                                       f"✅ Правильных ответов: <b>{correct_answers}/{total_questions}</b>\n" \
-                                       f"📈 Процент правильных: <b>{percentage:.1f}%</b>\n\n" \
-                                       f"🎉 <b>{grade}</b>\n\n" \
-                                       f"🎮 Хочешь сыграть еще раз?"
+                            # Создаем красивую статистику
+                            final_text = f"🏁 <b>ВИКТОРИНА ЗАВЕРШЕНА!</b> {emoji}\n\n" \
+                                       f"📊 <b>ТВОЯ СТАТИСТИКА:</b>\n" \
+                                       f"✅ Правильных: <b>{correct_answers}/{total_questions}</b>\n" \
+                                       f"📈 Процент успеха: <b>{percentage:.1f}%</b>\n" \
+                                       f"🎯 Оценка: <b>{grade}</b>\n\n" \
+                                       f"💬 <i>{motivation}</i>\n\n" \
+                                       f"🎮 <b>Что дальше?</b>\n" \
+                                       f"• Попробуй другую отрасль знаний\n" \
+                                       f"• Сыграй еще раз для улучшения результата\n" \
+                                       f"• Поделись результатом с друзьями!"
 
-                            await self._safe_edit_message(callback, final_text, keyboard_manager.get_menu_button())
+                            try:
+                                await self._safe_edit_message(callback, final_text, keyboard_manager.get_menu_button())
+                            except Exception as e:
+                                log_error(f"Ошибка при показе финальных результатов викторины: {str(e)}")
+                                await callback.answer("🎉 Викторина завершена! Проверьте результаты в чате.")
 
                             # Очищаем викторину
                             memory_manager.clear_user_active_game(user_id)
@@ -1199,14 +1240,23 @@ class AIBot:
                             # Сначала показываем результат
                             result_display_text = f"{result_emoji} <b>{result_text}</b>\n\n⏳ <i>Загружаем следующий вопрос...</i>"
 
-                            # Обновляем сообщение с результатом
-                            await self._safe_edit_message(callback, result_display_text, None)
+                            try:
+                                # Обновляем сообщение с результатом
+                                await self._safe_edit_message(callback, result_display_text, None)
 
-                            # Небольшая задержка перед следующим вопросом
-                            await asyncio.sleep(1.0)
+                                # Небольшая задержка перед следующим вопросом
+                                await asyncio.sleep(1.0)
 
-                            # Показываем следующий вопрос
-                            await self._show_next_quiz_question(callback)
+                                # Показываем следующий вопрос
+                                await self._show_next_quiz_question(callback)
+                            except Exception as e:
+                                # Если произошла ошибка с таймаутом, показываем следующий вопрос напрямую
+                                log_error(f"Ошибка при показе результата викторины: {str(e)}")
+                                try:
+                                    await self._show_next_quiz_question(callback)
+                                except Exception as e2:
+                                    log_error(f"Ошибка при показе следующего вопроса: {str(e2)}")
+                                    await callback.answer("❌ Произошла ошибка. Попробуйте продолжить викторину.")
                     else:
                         await callback.answer("❌ Ошибка: вопрос не найден")
                 else:
@@ -1263,9 +1313,54 @@ class AIBot:
                 combined_text = progress_text + hint_text
 
                 # Обновляем сообщение с подсказкой
-                await self._safe_edit_message(callback, combined_text, keyboard_manager.get_quiz_answers_menu(options, total_questions, used_hints + 1))
+                try:
+                    await self._safe_edit_message(callback, combined_text, keyboard_manager.get_quiz_answers_menu(options, total_questions, used_hints + 1))
+                    await callback.answer(f"💡 Подсказка использована! Осталось: {remaining_hints}")
+                except Exception as e:
+                    log_error(f"Ошибка при показе подсказки викторины: {str(e)}")
+                    await callback.answer("❌ Ошибка при показе подсказки")
 
-                await callback.answer(f"💡 Подсказка использована! Осталось: {remaining_hints}")
+            elif callback_data == "quiz_skip":
+                # Пропуск вопроса (только если использовано много подсказок)
+                quiz_session = memory_manager.get_user_game_data(user_id)
+
+                if not quiz_session or quiz_session.get('current_question') is None:
+                    await callback.answer("❌ Викторина не активна")
+                    return
+
+                current_q = quiz_session['current_question']
+                total_questions = quiz_session.get('total_questions', 0)
+                used_hints = quiz_session.get('used_hints', 0)
+
+                # Пропуск доступен только если использовано >= 2 подсказок
+                if used_hints < 2:
+                    await callback.answer("❌ Пропуск доступен только после использования 2+ подсказок!")
+                    return
+
+                # Отмечаем вопрос как пропущенный (неправильный ответ)
+                quiz_session['current_question'] += 1
+                memory_manager.update_user_game_data(user_id, "quiz_active", quiz_session)
+
+                skip_text = "⏭️ <b>Вопрос пропущен!</b>\n\n💭 <i>Иногда лучше пропустить и двигаться дальше...</i>\n\n⏳ <i>Загружаем следующий вопрос...</i>"
+
+                try:
+                    # Обновляем сообщение
+                    await self._safe_edit_message(callback, skip_text, None)
+
+                    # Небольшая задержка перед следующим вопросом
+                    await asyncio.sleep(1.5)
+
+                    # Показываем следующий вопрос или завершаем
+                    if quiz_session['current_question'] >= total_questions:
+                        # Викторина завершена
+                        await self._finish_quiz(callback, quiz_session)
+                    else:
+                        await self._show_next_quiz_question(callback)
+
+                    await callback.answer("⏭️ Вопрос пропущен!")
+                except Exception as e:
+                    log_error(f"Ошибка при пропуске вопроса викторины: {str(e)}")
+                    await callback.answer("❌ Ошибка при пропуске вопроса")
 
             elif callback_data == "quiz_settings":
                 # Возврат к настройкам викторины
@@ -2511,10 +2606,22 @@ class AIBot:
         # Получаем текущий вопрос
         question_data = quiz_session['questions'][current_q]
 
+        # Создаем красивый прогресс-бар
+        progress_bar = ""
+        for i in range(total_q):
+            if i < current_q:
+                progress_bar += "🟢"  # Завершенные вопросы
+            elif i == current_q:
+                progress_bar += "🔵"  # Текущий вопрос
+            else:
+                progress_bar += "⚪"  # Будущие вопросы
+
         # Показываем вопрос с прогрессом
-        progress_text = f"📊 <b>Вопрос {current_q + 1}/{total_q}</b>\n\n"
-        progress_text += f"❓ {question_data['question']}\n\n"
-        progress_text += "🎯 <b>Выбери правильный ответ:</b>"
+        progress_text = f"🎮 <b>ВИКТОРИНА</b> | {current_q + 1}/{total_q}\n"
+        progress_text += f"{progress_bar}\n\n"
+        progress_text += f"❓ <b>{question_data['question']}</b>\n\n"
+        progress_text += "🎯 <b>Выбери правильный ответ:</b>\n"
+        progress_text += "💭 <i>Думай внимательно!</i>"
 
         # Обновляем время начала вопроса
         quiz_session['question_start_time'] = datetime.now()
