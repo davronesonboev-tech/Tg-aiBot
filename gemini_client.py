@@ -24,12 +24,13 @@ class GeminiClient:
 
     def __init__(self):
         """Инициализирует клиент Gemini."""
-        self.api_key = config.GOOGLE_API_KEY
+        # Используем API ключ из переменной окружения или переданный ключ
+        self.api_key = config.GOOGLE_API_KEY or "AIzaSyC8dUCnPX_BRKUxxfK6R2pcXt8hMaESR08"
         self.model = config.GEMINI_MODEL  # Используем модель из конфигурации
         self.timeout = config.REQUEST_TIMEOUT
         self.base_url = config.GEMINI_BASE_URL
         self.session = None
-        
+
         self.generation_config = {
             "temperature": 0.7,
             "top_p": 0.95,
@@ -44,6 +45,28 @@ class GeminiClient:
             {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
             {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_MEDIUM_AND_ABOVE"}
         ]
+
+    def check_available_models(self) -> list:
+        """Проверяет доступные модели Gemini API."""
+        try:
+            url = f"https://generativelanguage.googleapis.com/v1beta/models?key={self.api_key}"
+
+            if not self.session:
+                self.session = aiohttp.ClientSession()
+
+            async with self.session.get(url, timeout=self.timeout) as response:
+                if response.status == 200:
+                    data = await response.json()
+                    models = [model['name'] for model in data.get('models', [])]
+                    return models
+                else:
+                    error_text = await response.text()
+                    print(f"❌ Ошибка проверки моделей: {response.status} - {error_text}")
+                    return []
+
+        except Exception as e:
+            print(f"❌ Ошибка при проверке моделей: {str(e)}")
+            return []
 
     async def _get_session(self):
         """Получить или создать aiohttp сессию."""
